@@ -1,0 +1,258 @@
+/* ===== GENERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+:root {
+  --sidebar-w: 314px;
+  --topbar-h: 100px;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: #D9EEEA;
+  border-right: 1px solid #646464;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+
+.logo {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.user-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.user-name {
+  margin-top: 20px;
+  font-size: 20px;
+  color: #333;
+  text-align: center;
+}
+
+/* MENU */
+.menu {
+  margin-top: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.menu a {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  text-decoration: none;
+  padding: 10px;
+  font-size: 18px;
+  color: #31393C;
+  transition: background 0.3s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu a:hover {
+  background: #B2E3D9;
+}
+
+.menu a.active {
+  background: #C0EDE4;
+}
+
+/* LOGOUT */
+.logout {
+  margin-top: auto;
+  margin-bottom: 40px;
+  color: red;
+  font-size: 18px;
+  background: none;
+  border: none;
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: #B2E3D9;
+}
+
+/* ===== TOP MENU ===== */
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-w);
+  width: calc(100% - var(--sidebar-w));
+  height: var(--topbar-h);
+  background: #D9EEEA;
+  border-bottom: 1px solid #646464;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 40px;
+  gap: 20px;
+  z-index: 100;
+}
+
+/* STATUS BOX */
+.status-box {
+  border: 3px solid #00FF04;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.status-text {
+  font-weight: 700;
+  color: #31393C;
+}
+
+.status-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* TIME BOX */
+.time-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  margin-left: var(--sidebar-w);
+  padding: 24px 32px;
+  padding-top: calc(var(--topbar-h) + 24px);
+  min-height: 100vh;
+}
+
+.main-content h1 {
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+/* ===== PRODUCT GRID ===== */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+/* ⛔ UNCHANGED: original product button style */
+.product-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.product-btn:hover {
+  transform: scale(1.03);
+}
+
+.product-btn img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 6px 6px rgba(0,0,0,0.25);
+}
+
+/* ===== ADD PRODUCT CARD (OPTIONAL) ===== */
+.add-btn {
+  background: #D9D9D9;
+  border: none;
+  border-radius: 10px;
+  font-size: 300px;
+  color: #fff;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  cursor: pointer;
+  transition: background 0.3s;
+  box-shadow: 0 6px 6px rgba(0,0,0,0.25);
+}
+
+.add-btn:hover {
+  background: #b5b5b5;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-content {
+    max-width: 100%;
+  }
+}
+
+/* ✅ Sidebar flexibility */
+.sidebar {
+  overflow: hidden; /* prevents menu from overflowing outside */
+}
+
+/* ✅ Menu should take remaining space and scroll if needed */
+.menu {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 30px; /* a bit smaller */
+  padding-bottom: 10px;
+}
+
+/* optional: nicer scrollbar */
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
+.menu::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+}

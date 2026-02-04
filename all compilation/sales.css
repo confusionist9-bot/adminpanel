@@ -1,0 +1,378 @@
+/* ===== GENERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+:root {
+  --sidebar-w: 314px;
+  --topbar-h: 100px;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: #D9EEEA;
+  border-right: 1px solid #646464;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+
+.logo {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.user-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.user-name {
+  margin-top: 20px;
+  font-size: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.menu {
+  margin-top: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.menu a {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  text-decoration: none;
+  padding: 10px;
+  font-size: 18px;
+  color: #31393C;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu a:hover {
+  background: #B2E3D9;
+}
+
+.menu a.active {
+  background: #C0EDE4;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.logout {
+  margin-top: auto;
+  margin-bottom: 40px;
+  color: red;
+  font-size: 18px;
+  background: none;
+  border: none;
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  font-family: 'Inter', sans-serif;
+}
+
+.logout:hover {
+  background: #B2E3D9;
+}
+
+/* ===== TOP MENU ===== */
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-w);
+  width: calc(100% - var(--sidebar-w));
+  height: var(--topbar-h);
+  background: #D9EEEA;
+  border-bottom: 1px solid #646464;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 40px;
+  gap: 20px;
+  z-index: 100;
+}
+
+/* STATUS BOX */
+.status-box {
+  border: 2px solid #00B84A; /* toned down from neon */
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 0;
+}
+
+.status-text {
+  font-weight: 700;
+  color: #31393C;
+}
+
+.status-box:hover {
+  transform: scale(1.05);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* TIME BOX */
+.time-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== SALES OVERVIEW CONTENT ===== */
+.content {
+  margin-left: var(--sidebar-w);
+  padding: 24px 32px;
+  padding-top: calc(var(--topbar-h) + 24px);
+  min-height: 100vh;
+  max-width: 100%;
+}
+
+/* Header */
+.sales-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.left-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.sales-range {
+  font-size: 14px;
+  color: #052029;
+  margin-top: 6px;
+}
+
+.total-sales {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* GRAPH AREA */
+.graph-container {
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  height: 360px;
+  overflow: hidden;
+}
+
+/* Let Chart.js + container control size */
+#salesChart {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/*        ORDERS MANAGEMENT        */
+.orders-container {
+  margin-top: 28px;
+  width: 100%;
+}
+
+.orders-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Table */
+.table-wrapper {
+  background: white;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid #d7e2dd;
+  overflow: hidden;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e7f0eb;
+}
+
+.table-header {
+  background: #f1f7f4;
+  font-weight: 600;
+  cursor: default;
+}
+
+.table-row {
+  cursor: pointer;
+}
+
+.table-row:hover {
+  background: #f8fcfa;
+}
+
+.table-row select {
+  width: 140px;
+  padding: 6px;
+  border: 1px solid #c8d7d1;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* Dropdown */
+.dropdown-content {
+  display: none;
+  background: #ffffff;
+
+  padding: 18px 20px;
+
+  /* NEW: full border */
+  border: 1px solid #d7e2dd;
+
+  /* NEW: separation */
+  margin-bottom: 10px;
+
+  /* rounded bottom so it feels like a card */
+  border-radius: 0 0 10px 10px;
+}
+
+
+.dropdown-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.box {
+  border: 1px solid #d7e2dd;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fcfffd;
+}
+
+.box-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.info-line {
+  margin-bottom: 6px;
+}
+
+/* Delivery rider fields */
+.box input {
+  width: 100%;
+  padding: 7px;
+  margin-bottom: 8px;
+  border: 1px solid #c8d7d1;
+  border-radius: 6px;
+}
+
+.disabled {
+  background: #e7ecea;
+  pointer-events: none;
+}
+
+.apply-btn {
+  margin-top: 10px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #bde8cc;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.apply-btn:hover {
+  background: #a8dec0;
+}
+
+.table-row {
+  cursor: pointer;
+  background: #ffffff;
+}
+
+.table-row.active {
+  background: #f8fcfa;
+}
+
+
+/* ===== SMALL RESPONSIVE FIX ===== */
+@media (max-width: 1100px) {
+  .dropdown-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+}
+
+/* ✅ Sidebar flexibility */
+.sidebar {
+  overflow: hidden; /* prevents menu from overflowing outside */
+}
+
+/* ✅ Menu should take remaining space and scroll if needed */
+.menu {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 30px; /* a bit smaller */
+  padding-bottom: 10px;
+}
+
+/* optional: nicer scrollbar */
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
+.menu::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+}

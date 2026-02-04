@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Mango</title>
+  <link rel="stylesheet" href="edit-mango.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo-section">
+      <img src="logo.png" alt="MiYummy Logo" class="logo">
+    </div>
+    <div class="user-section">
+      <p class="user-name"><strong>(Admin Dashboard)</strong></p>
+    </div>
+
+    <nav class="menu">
+      <a href="sales.html">Sales overview</a>
+      <a href="users.html">Users management</a>
+      <a href="products.html" class="active">Products</a>
+      <a href="branches.html">Branches</a>
+    </nav>
+
+    <button class="logout" onclick="handleLogout()">Log out</button>
+  </div>
+
+  <div class="top-menu">
+    <div class="status">
+      <div class="status-box">
+        <span class="status-text">Service Active</span>
+      </div>
+    </div>
+    <div id="clock" class="time-box"></div>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      minutes = minutes.toString().padStart(2, '0');
+      document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function handleLogout() {
+      if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+
+  <main class="main-content" aria-label="Edit product area">
+    <div class="main-inner">
+      <div class="page-header">
+        <div class="title-area">
+          <img src="mangoicon.png" alt="Mango image" class="product-thumb">
+          <h1 class="page-title">Mango Graham Flavor</h1>
+        </div>
+
+        <div class="product-status">
+          <span class="status-label">Product Status</span>
+          <div class="status-pill" id="productStatusPill" data-status="available">
+            <span class="pill-text">Available</span>
+            <span class="pill-dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <section class="card general-info">
+        <h2>General information</h2>
+
+        <label class="field-label">Product name</label>
+        <input id="productName" class="input full" type="text" value="Mango Graham Flavor" disabled>
+
+        <label class="field-label">Product description</label>
+        <textarea id="productDesc" class="input textarea" disabled>Sweet and tropical taste of real mango bits, mixed with soft pearls and crushed graham for extra flavor. This creamy and refreshing shake is a perfect mango treat!</textarea>
+
+        <div class="grid-two">
+          <div>
+            <label class="section-label">Price per size</label>
+            <div class="sizes">
+              <div class="size-item">
+                <div class="size-label">12 oz</div>
+                <input id="price12" class="input price" type="text" inputmode="decimal" value="45.00">
+              </div>
+              <div class="size-item">
+                <div class="size-label">16 oz</div>
+                <input id="price16" class="input price" type="text" inputmode="decimal" value="55.00">
+              </div>
+            </div>
+          </div>
+
+          <div class="divider-vertical">
+            <label class="section-label">Price per add on</label>
+            <div class="addons">
+              <div class="addon-row">
+                <label class="addon-name">Pearls</label>
+                <input id="addonPearlsPrice" class="input addon-price" type="text" inputmode="decimal" value="5.00">
+                <label class="switch">
+                  <input id="addonPearlsToggle" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="addon-row">
+                <label class="addon-name">Graham</label>
+                <input id="addonGrahamPrice" class="input addon-price" type="text" inputmode="decimal" value="5.00">
+                <label class="switch">
+                  <input id="addonGrahamToggle" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="addon-row">
+                <label class="addon-name">Mango Bits</label>
+                <input id="addonMangoBitsPrice" class="input addon-price" type="text" inputmode="decimal" value="10.00">
+                <label class="switch">
+                  <input id="addonMangoBitsToggle" type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button id="saveBtn" class="save-btn">Save update</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="service-status.js"></script>
+  <script src="edit-mango.js"></script>
+</body>
+</html>

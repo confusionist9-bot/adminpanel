@@ -1,0 +1,409 @@
+/* ===== GENERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+:root {
+  --sidebar-w: 314px;
+  --topbar-h: 100px;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: #D9EEEA;
+  border-right: 1px solid #646464;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+
+.logo {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.user-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.user-name {
+  margin-top: 20px;
+  font-size: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.menu {
+  margin-top: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.menu a {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  text-decoration: none;
+  padding: 10px;
+  font-size: 18px;
+  color: #31393C;
+  transition: background 0.3s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu a:hover {
+  background: #B2E3D9;
+}
+
+.menu a.active {
+  background: #C0EDE4;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.logout {
+  margin-top: auto;
+  margin-bottom: 40px;
+  color: red;
+  font-size: 18px;
+  background: none;
+  border: none;
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout:hover {
+  background: #B2E3D9;
+}
+
+/* ===== TOP MENU ===== */
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-w);
+  width: calc(100% - var(--sidebar-w));
+  height: var(--topbar-h);
+  background: #D9EEEA;
+  border-bottom: 1px solid #646464;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 40px;
+  gap: 20px;
+  z-index: 100;
+}
+
+/* STATUS BOX */
+.status-box {
+  border: 3px solid #00FF04;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.status-text {
+  font-weight: 700;
+  color: #31393C;
+}
+
+.status-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* TIME BOX */
+.time-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== MAIN CONTENT AREA ===== */
+.main-content {
+  margin-left: var(--sidebar-w);
+  padding: 24px 32px;
+  padding-top: calc(var(--topbar-h) + 24px);
+  min-height: 100vh;
+}
+
+/* TITLE */
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+/* List container spacing */
+#branchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* BRANCH CARD */
+.branch-card {
+  background: #F2F3F1;
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  border: 1px solid #e3e6e2;
+}
+
+/* DELETE ICON BUTTON (single source of truth) */
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.trash-icon {
+  width: 32px;
+  height: 32px;
+  stroke: #E53935;
+  stroke-width: 2;
+  fill: none;
+  transition: transform 0.2s ease, stroke 0.2s ease;
+}
+
+.delete-btn:hover .trash-icon {
+  stroke: #B71C1C;
+  transform: scale(1.15);
+}
+
+/* INFO */
+.branch-info {
+  flex: 1;
+  min-width: 0; /* prevents overflow on long text */
+}
+
+.branch-info h3 {
+  font-size: 18px;
+  margin-bottom: 5px;
+  color: #1f2a2d;
+}
+
+.branch-info p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.branch-info span {
+  font-size: 13px;
+  color: #777;
+}
+
+/* ACTIONS */
+.branch-actions {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.edit-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.edit-btn:hover {
+  background: #f7f7f7;
+}
+
+/* STATUS BUTTON */
+.status-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.status-btn .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* OPEN */
+.status-btn.open {
+  background: #C8F3D2;
+}
+
+.status-btn.open .dot {
+  background: green;
+}
+
+/* INACTIVE */
+.status-btn.inactive {
+  background: #E8A5A5;
+}
+
+.status-btn.inactive .dot {
+  background: red;
+}
+
+
+/* ADD BRANCH */
+.add-branch-card {
+  height: 84px;
+  border: 3px dashed #ddd;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 42px;
+  color: #bbb;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+}
+
+.add-branch-card:hover {
+  background: #f8f8f8;
+  border-color: #cfcfcf;
+}
+
+/* ===== FORM CARD (for add/edit pages) ===== */
+.form-card {
+  background: #F2F3F1;
+  padding: 30px;
+  border-radius: 16px;
+  width: 100%;
+  border: 1px solid #e3e6e2;
+}
+
+.form-card label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.form-card input,
+.form-card textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.form-card textarea {
+  resize: none;
+  height: 90px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel-btn {
+  padding: 8px 18px;
+  background: #eee;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+}
+
+.save-btn {
+  padding: 8px 18px;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .branch-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .branch-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .main-content {
+    max-width: 100%;
+  }
+}
+
+/* ✅ Sidebar flexibility */
+.sidebar {
+  overflow: hidden; /* prevents menu from overflowing outside */
+}
+
+/* ✅ Menu should take remaining space and scroll if needed */
+.menu {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 30px; /* a bit smaller */
+  padding-bottom: 10px;
+}
+
+/* optional: nicer scrollbar */
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
+.menu::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+}

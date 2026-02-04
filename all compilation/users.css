@@ -1,0 +1,334 @@
+/* ===== GENERAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+:root {
+  --sidebar-w: 314px;
+  --topbar-h: 100px;
+}
+
+body {
+  background: #ffffff;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: #d9eeea;
+  border-right: 1px solid #646464;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+
+.logo {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.user-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.user-name {
+  margin-top: 20px;
+  font-size: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.menu {
+  margin-top: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.menu a {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  text-decoration: none;
+  padding: 10px;
+  font-size: 18px;
+  color: #31393c;
+  transition: background 0.3s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu a:hover {
+  background: #b2e3d9;
+}
+
+.menu a.active {
+  background: #c0ede4;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.logout {
+  margin-top: auto;
+  margin-bottom: 40px;
+  color: red;
+  font-size: 18px;
+  background: none;
+  border: none;
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout:hover {
+  background: #b2e3d9;
+}
+
+/* ===== TOP MENU ===== */
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-w);
+  width: calc(100% - var(--sidebar-w));
+  height: var(--topbar-h);
+  background: #d9eeea;
+  border-bottom: 1px solid #646464;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 40px;
+  gap: 20px;
+  z-index: 100;
+}
+
+/* STATUS BOX */
+.status-box {
+  border: 2px solid #00b84a;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.status-text {
+  font-weight: 700;
+  color: #31393c;
+}
+
+.status-box:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* TIME BOX */
+.time-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  margin-left: var(--sidebar-w);
+  padding: 24px 32px;
+  padding-top: calc(var(--topbar-h) + 24px);
+  min-height: 100vh;
+}
+
+/* Page header row */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Search */
+.search-container input {
+  width: 260px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cfd8d3;
+  outline: none;
+}
+
+.search-container input:focus {
+  border-color: #86c9b8;
+  box-shadow: 0 0 0 3px rgba(134, 201, 184, 0.25);
+}
+
+/* Table card */
+.table-card {
+  background: #fff;
+  border: 1px solid #d7e2dd;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* Table */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px; /* keeps columns stable */
+}
+
+.users-table thead th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  background: #f1f7f4;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e7f0eb;
+  white-space: nowrap;
+}
+
+.users-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef5f1;
+  vertical-align: middle;
+}
+
+.users-table tbody tr:hover {
+  background: #f8fcfa;
+}
+
+/* Column sizing */
+.col-profile {
+  width: 90px;
+}
+.col-number {
+  width: 160px;
+}
+.col-status {
+  width: 110px;
+}
+.col-action {
+  width: 120px;
+}
+
+/* Profile icon */
+.user-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Email link */
+.users-table a {
+  color: #0b57d0;
+  text-decoration: none;
+}
+.users-table a:hover {
+  text-decoration: underline;
+}
+
+/* Status dots */
+.status-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.status-dot.active {
+  background: #16a34a;
+}
+.status-dot.inactive {
+  background: #dc2626;
+}
+
+/* Delete button */
+.delete-btn {
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-container input {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .main-content {
+    max-width: 100%;
+  }
+}
+
+/* ✅ Sidebar flexibility */
+.sidebar {
+  overflow: hidden; /* prevents menu from overflowing outside */
+}
+
+/* ✅ Menu should take remaining space and scroll if needed */
+.menu {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 30px; /* a bit smaller */
+  padding-bottom: 10px;
+}
+
+/* optional: nicer scrollbar */
+.menu::-webkit-scrollbar {
+  width: 6px;
+}
+.menu::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 10px;
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branches</title>
+  <link rel="stylesheet" href="branches.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo-section">
+      <img src="logo.png" alt="MiYummy Logo" class="logo">
+    </div>
+    <div class="user-section">
+      <p class="user-name"><strong>(Admin Dashboard)</strong></p>
+    </div>
+    <nav class="menu">
+  <a href="sales.html" >Sales overview</a>
+  <a href="users.html">Users management</a>
+  <a href="products.html">Products</a>
+  <a href="branches.html"  class="active">Branches</a>
+</nav>
+
+    <!-- ✅ Log out button -->
+    <button class="logout" onclick="handleLogout()">
+      Log out
+    </button>
+  </div>
+
+  <!-- Top Menu -->
+  <div class="top-menu">
+    <div class="status">
+      <div class="status-box">
+        <span class="status-text">Service Active</span>
+      </div>
+    </div>
+    <div id="clock" class="time-box"></div>
+  </div>
+
+  <script>
+  // ✅ Real-time clock
+  function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+    minutes = minutes.toString().padStart(2, '0');
+
+    const timeString = `${hours}:${minutes} ${ampm}`;
+    document.getElementById('clock').textContent = timeString;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ✅ Logout button
+  function handleLogout() {
+    if (confirm("Are you sure you want to log out?")) {
+      window.location.href = "login.html";
+    }
+  }
+  </script>
+
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
+  <h1 class="page-title">Branches</h1>
+
+  <!-- JS will render branch cards here -->
+  <div id="branchesList"></div>
+
+  <!-- Add Branch -->
+  <a href="add-branch.html" class="add-branch-card">+</a>
+</div>
+
+
+
+ <script src="service-status.js"></script> <!-- this is for the service status toggle -->
+  <script src="branches.js"></script>
+</body>
+</html>

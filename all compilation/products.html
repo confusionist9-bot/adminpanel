@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products</title>
+  <link rel="stylesheet" href="products.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo-section">
+      <img src="logo.png" alt="MiYummy Logo" class="logo">
+    </div>
+
+    <div class="user-section">
+      <p class="user-name"><strong>(Admin Dashboard)</strong></p>
+    </div>
+
+    <nav class="menu">
+      <a href="sales.html">Sales overview</a>
+      <a href="users.html">Users management</a>
+      <a href="products.html" class="active">Products</a>
+      <a href="branches.html">Branches</a>
+    </nav>
+
+    <button class="logout" onclick="handleLogout()">Log out</button>
+  </div>
+
+  <!-- Top Menu -->
+  <div class="top-menu">
+    <div class="status">
+      <div class="status-box">
+        <span class="status-text">Service Active</span>
+      </div>
+    </div>
+
+    <div id="clock" class="time-box"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1>Edit Products</h1>
+    </div>
+
+    <div class="product-grid">
+      <button class="product-btn" onclick="window.location.href='edit-mango.html'">
+        <img src="mangothumbnail.jpg" alt="Mango Graham">
+      </button>
+
+      <button class="product-btn" onclick="window.location.href='edit-strawberry.html'">
+        <img src="strawberrythumbnail.jpg" alt="Strawberry Flavor">
+      </button>
+
+      <button class="product-btn" onclick="window.location.href='edit-melon.html'">
+        <img src="melonthumbnail.jpg" alt="Melon Flavor">
+      </button>
+
+      <button class="product-btn" onclick="window.location.href='edit-avocado.html'">
+        <img src="avocadothumbnail.jpg" alt="Avocado Flavor">
+      </button>
+
+      <button class="product-btn" onclick="window.location.href='edit-cucumber.html'">
+        <img src="cucumberthumbnail.jpg" alt="Cucumber Flavor">
+      </button>
+
+      <button class="product-btn" onclick="window.location.href='edit-guyabano.html'">
+        <img src="guyabanothumbnail.jpg" alt="Guyabano Flavor">
+      </button>
+
+      <!-- OPTIONAL: Add Product button (if you want)
+      <button class="product-btn add-product" onclick="window.location.href='add-product.html'">
+        +
+      </button>
+      -->
+    </div>
+  </div>
+
+  <!-- Clock + Logout -->
+  <script>
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+
+      hours = hours % 12 || 12;
+      minutes = minutes.toString().padStart(2, '0');
+
+      document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function handleLogout() {
+      if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+
+  <script src="service-status.js"></script>
+  <!-- If your file is NOT inside /js folder, use products.js -->
+  <script src="products.js" defer></script>
+</body>
+</html>

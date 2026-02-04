@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales overview</title>
+  <link rel="stylesheet" href="sales.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo-section">
+      <img src="logo.png" alt="MiYummy Logo" class="logo">
+    </div>
+    <div class="user-section">
+      <p class="user-name"><strong>(Admin Dashboard)</strong></p>
+    </div>
+  <nav class="menu">
+  <a href="sales.html" class="active">Sales overview</a>
+  <a href="users.html">Users management</a>
+  <a href="products.html">Products</a>
+  <a href="branches.html">Branches</a>
+</nav>
+
+
+    <!-- ✅ Log out button -->
+    <button class="logout" onclick="handleLogout()">
+      Log out
+    </button>
+  </div>
+    <!-- Top Menu -->
+  <div class="top-menu">
+    <div class="status">
+      <div class="status-box">
+        <span class="status-text">Service Active</span>
+      </div>
+    </div>
+    <div id="clock" class="time-box"></div>
+  </div>
+
+    <script>
+  // ✅ Real-time clock
+  function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12 || 12;
+    minutes = minutes.toString().padStart(2, '0');
+
+    const timeString = `${hours}:${minutes} ${ampm}`;
+    document.getElementById('clock').textContent = timeString;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ✅ Logout button
+  function handleLogout() {
+    if (confirm("Are you sure you want to log out?")) {
+      window.location.href = "login.html";
+    }
+  }
+  </script>
+  
+
+  <!-- Sales Overview Content -->
+  <div class="content">
+    <div class="sales-header">
+      <div class="left-header">
+        <h2>Sales Overview</h2>
+        <div id="dayRangeLabel" style="font-size:16px; opacity:0.8; margin-top:6px;"></div>
+      </div>
+      <p class="total-sales" id="totalSalesDisplay">Total Sales: ₱0.00</p>
+    </div>
+    
+
+    <!-- GRAPH AREA -->
+    <div class="graph-container">
+      <canvas id="salesChart"></canvas>
+    </div>
+
+    <!--       ORDERS MANAGEMENT       -->
+  
+    <div class="orders-container">
+      <h2 class="orders-title">Orders Management</h2>
+
+      <div class="table-wrapper" id="ordersTable">
+        <div class="table-header">
+          <div>Username</div>
+          <div>Order number</div>
+          <div>Order amount</div>
+          <div>Order status</div>
+        </div>
+
+      <!-- ✅ rows will be injected by sales.js -->
+      </div>
+
+    </div>
+    <!-- END ORDERS SECTION -->
+  </div>
+
+<script src="service-status.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="sales.js"></script>
+
+
+</body>
+</html>
