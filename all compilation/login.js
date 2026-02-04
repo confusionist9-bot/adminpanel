@@ -1,4 +1,4 @@
-const API_BASE = "https://miyummybackend.onrender.com";
+const API_BASE = "https://miyummybackend.onrender.com"; // ✅ Render base URL (no trailing slash)
 const ADMIN_TOKEN_KEY = "adminToken";
 
 // DOM
@@ -14,36 +14,77 @@ if (localStorage.getItem(ADMIN_TOKEN_KEY)) {
   window.location.href = "sales.html";
 }
 
-async function adminLogin(identifier, password) {
-  const res = await fetch(`${API_BASE}/auth/admin-login`, {
+async function postJson(path, bodyObj) {
+  const url = `${API_BASE}${path}`;
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ identifier, password })
+    body: JSON.stringify(bodyObj)
   });
 
-  // ✅ Read text first so we can show it even if JSON fails
   const raw = await res.text();
-  let data = {};
-  try { data = JSON.parse(raw); } catch {}
+  let data = null;
+  try { data = JSON.parse(raw); } catch { /* keep null */ }
 
-  // ✅ DEBUG: see exact response
-  console.log("ADMIN LOGIN STATUS:", res.status);
-  console.log("ADMIN LOGIN RAW:", raw);
-
-  if (!res.ok) {
-    // show exact backend message on screen
-    throw new Error(data.message || raw || `Login failed (${res.status})`);
-  }
-
-  return data.token;
+  return { res, raw, data };
 }
 
+/**
+ * ✅ Admin login (robust)
+ * 1) Try /auth/admin-login (preferred)
+ * 2) If backend doesn't have it (404), fallback to /auth/login + check isAdmin
+ */
+async function adminLogin(identifier, password) {
+  // 1) Try admin-login endpoint
+  const first = await postJson("/auth/admin-login", { identifier, password });
+
+  console.log("ADMIN LOGIN (admin-login) STATUS:", first.res.status);
+  console.log("ADMIN LOGIN (admin-login) RAW:", first.raw);
+
+  if (first.res.ok) {
+    // Expect token in response
+    const token = first.data?.token;
+    if (!token) throw new Error("Login succeeded but token missing.");
+    return token;
+  }
+
+  // If backend route is missing, fallback to /auth/login
+  const looksLikeRouteMissing =
+    first.res.status === 404 ||
+    (first.raw && first.raw.includes("Cannot POST /auth/admin-login"));
+
+  if (!looksLikeRouteMissing) {
+    // Not a 404 route-missing => show real error
+    throw new Error(first.data?.message || first.raw || `Login failed (${first.res.status})`);
+  }
+
+  // 2) Fallback: normal login
+  const second = await postJson("/auth/login", { identifier, password });
+
+  console.log("ADMIN LOGIN (fallback /login) STATUS:", second.res.status);
+  console.log("ADMIN LOGIN (fallback /login) RAW:", second.raw);
+
+  if (!second.res.ok) {
+    throw new Error(second.data?.message || second.raw || `Login failed (${second.res.status})`);
+  }
+
+  // Must be admin
+  const token = second.data?.token;
+  const user = second.data?.user;
+
+  if (!token) throw new Error("Login succeeded but token missing.");
+  if (!user || user.isAdmin !== true) {
+    throw new Error("Admin only.");
+  }
+
+  return token;
+}
 
 loginBtn.addEventListener("click", async function () {
   errorMessage.textContent = "";
 
   const identifier = usernameInput.value.trim();
-  const password = passwordInput.value.trim();
+  const password = passwordInput.value; // don't trim password
 
   if (!identifier || !password) {
     errorMessage.textContent = "Please enter username/email and password.";
@@ -63,12 +104,12 @@ loginBtn.addEventListener("click", async function () {
     errorMessage.style.color = "red";
   } finally {
     loginBtn.disabled = false;
-    loginBtn.textContent = "Login";
+    loginBtn.textContent = "Log in";
   }
 });
 
 // Enter key triggers login
-document.addEventListener("keypress", function (event) {
+document.addEventListener("keydown", function (event) {
   if (event.key === "Enter") loginBtn.click();
 });
 
