@@ -1,7 +1,51 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url=login.html" />
-  </head>
-  <body></body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="loginstyle.css">
+</head>
+<body>
+
+  <div class="overlay">
+    <!-- Left Logo -->
+    <div class="left">
+      <img src="logo.png" alt="Logo">
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Right Login Form -->
+    <div class="right">
+      <h2>Welcome</h2>
+      <p>PLEASE LOGIN TO ADMIN DASHBOARD</p>
+
+      <div class="input-box">
+        <input type="text" id="username" placeholder="Username">
+
+        <!-- ✅ Password with Eye Icon -->
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Password" aria-describedby="togglePassword">
+          <button type="button" id="togglePassword" class="toggle-password" aria-label="Show password" aria-pressed="false">
+            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <p id="error-message"></p> <!-- ⚠️ Error message placeholder -->
+        <button class="login-btn" id="loginBtn">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="version">Version 1.0 testing</div>
+
+  <!-- ✅ JavaScript -->
+  <script src="login.js"></script>
+
+</body>
 </html>
