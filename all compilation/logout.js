@@ -1,16 +1,13 @@
-// logout.js (GLOBAL ADMIN GUARD + LOGOUT)
-// Works on ALL admin pages (branches, add/edit branch, edit flavors, etc.)
-
+// logout.js (works on Vercel + blocks secured pages)
 (() => {
   const ADMIN_TOKEN_KEY = "adminToken";
-  const LOGIN_PAGE = "login.html";
 
   function goToLogin() {
-    // replace prevents going "Back" into secured pages
-    window.location.replace(LOGIN_PAGE);
+    // ✅ your login is index.html at site root
+    window.location.replace("/");
   }
 
-  // Make them GLOBAL so onclick="adminLogout()" works everywhere
+  // ✅ global functions for onclick="adminLogout()"
   window.requireAdminLogin = function requireAdminLogin() {
     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
     if (!token) {
@@ -25,19 +22,20 @@
     goToLogin();
   };
 
-  // Auto-guard: any page that includes logout.js becomes protected
   document.addEventListener("DOMContentLoaded", () => {
+    // ✅ protect every page that includes logout.js
     window.requireAdminLogin();
 
-    // If you want, this makes logout work even WITHOUT onclick=""
-    const btn =
+    // ✅ make logout work even if it's an <a href="..."> or button
+    const logoutEl =
       document.getElementById("logoutBtn") ||
-      document.querySelector(".logout");
+      document.querySelector(".logout") ||
+      document.querySelector("[data-logout]");
 
-    if (btn) {
-      btn.addEventListener("click", (e) => {
-        // if it was a link/button, stop weird default behavior
-        e.preventDefault();
+    if (logoutEl) {
+      logoutEl.addEventListener("click", (e) => {
+        e.preventDefault();   // ✅ stops link navigation to 404
+        e.stopPropagation();
 
         if (confirm("Are you sure you want to log out?")) {
           window.adminLogout();
