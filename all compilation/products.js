@@ -1,11 +1,21 @@
 // products.js (SECURED PAGE GUARD)
 const ADMIN_TOKEN_KEY = "adminToken";
 
+// ✅ Vercel-safe login redirect
+function goToLogin() {
+  window.location.href = "/"; // index.html
+}
+
+function adminLogout() {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  goToLogin();
+}
+
 function requireAdminLogin() {
   const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
     // block page immediately
-    window.location.replace("login.html");
+    goToLogin();
     return false;
   }
   return true;
