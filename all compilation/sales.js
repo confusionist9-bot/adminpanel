@@ -3,17 +3,30 @@ window.API_BASE = API_BASE;
 
 const ADMIN_TOKEN_KEY = "adminToken";
 
+// ✅ always send user back to Vercel home (index.html)
+function goToLogin() {
+  window.location.href = "/"; // ✅ IMPORTANT: Vercel login page is /
+}
+
 function requireAdminLogin() {
   const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
-    window.location.href = "login.html";
-    // throw new Error("Not logged in");
+    goToLogin();
+    return null;
   }
   return token;
 }
 
+// ✅ call this on logout button
+function adminLogout() {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  goToLogin();
+}
+window.adminLogout = adminLogout;
+
 async function apiFetch(path, options = {}) {
   const token = requireAdminLogin();
+  if (!token) throw new Error("Not logged in");
 
   const headers = {
     ...(options.headers || {}),
@@ -25,8 +38,13 @@ async function apiFetch(path, options = {}) {
   }
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+
+  // safer parsing (won't crash on empty/non-json)
+  const raw = await res.text();
+  let data = {};
+  try { data = JSON.parse(raw); } catch {}
+
+  if (!res.ok) throw new Error(data.message || raw || `Request failed (${res.status})`);
   return data;
 }
 
