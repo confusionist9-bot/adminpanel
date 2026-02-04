@@ -23,7 +23,7 @@
 </nav>
 
     <!-- ✅ Log out button -->
-    <button class="logout" onclick="handleLogout()">
+    <button class="logout" onclick="adminLogout()">
       Log out
     </button>
   </div>
@@ -57,7 +57,7 @@
   updateClock();
 
   // ✅ Logout button
-  function handleLogout() {
+  function adminLogout() {
     if (confirm("Are you sure you want to log out?")) {
       window.location.href = "login.html";
     }

@@ -22,7 +22,7 @@
       <a href="branches.html">Branches</a>
     </nav>
 
-    <button class="logout" onclick="handleLogout()">Log out</button>
+    <button class="logout" onclick="adminLogout()">Log out</button>
   </div>
 
   <div class="top-menu">
@@ -47,7 +47,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    function handleLogout() {
+    function adminLogout() {
       if (confirm("Are you sure you want to log out?")) {
         window.location.href = "login.html";
       }
