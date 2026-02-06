@@ -1,4 +1,4 @@
-/* General Body */
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -10,9 +10,8 @@ body {
   backdrop-filter: blur(4px);
 }
 
-/* Login Container */
 .overlay {
-  background: rgba(230, 255, 255, 0.78); /* transparent #E6FFFF */
+  background: rgba(230, 255, 255, 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   width: 800px;
@@ -26,7 +25,6 @@ body {
   position: relative;
 }
 
-/* Left Section (Logo) */
 .left {
   flex: 1;
   display: flex;
@@ -43,14 +41,12 @@ body {
   padding: 20px;
 }
 
-/* Divider */
 .divider {
   width: 2px;
   background: rgba(0, 0, 0, 0.2);
   height: 80%;
 }
 
-/* Right Section (Form) */
 .right {
   flex: 1.2;
   display: flex;
@@ -73,7 +69,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Input + Button Group */
 .input-box {
   width: 80%;
   display: flex;
@@ -91,7 +86,7 @@ body {
   border: 1px solid #ccc;
   outline: none;
 }
-/* Fix input alignment and box width consistency */
+
 .input-box input {
   display: block;
   width: 100%;
@@ -103,14 +98,11 @@ body {
   box-sizing: border-box;
 }
 
-
-/* Input Focus */
 .input-box input:focus {
   border-color: #ffb347;
   box-shadow: 0 0 5px rgba(255, 179, 71, 0.5);
 }
 
-/* Login Button */
 .login-btn {
   background: white;
   font-weight: bold;
@@ -124,8 +116,6 @@ body {
   border: none;
 }
 
-
-/* Version Label */
 .version {
   position: absolute;
   bottom: 20px;
@@ -135,13 +125,13 @@ body {
   color: #ffffff;
 }
 #error-message {
-  height: 16px; /* keeps layout stable */
+  height: 16px;
   color: red;
   font-size: 13px;
   margin-top: -8px;
   margin-bottom: 4px;
 }
-/* Password wrapper + toggle eye */
+
 .password-wrapper {
   position: relative;
   width: 100%;
@@ -149,7 +139,7 @@ body {
 
 .password-wrapper input {
   width: 100%;
-  padding-right: 44px; /* space for the eye button */
+  padding-right: 44px;
   box-sizing: border-box;
 }
 

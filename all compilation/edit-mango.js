@@ -1,4 +1,4 @@
-// edit-mango.js
+
 (function () {
   const API_BASE = "https://miyummybackend.onrender.com";
   const SLUG = "mango-graham";
@@ -34,9 +34,6 @@
     return data;
   }
 
-  // =========================
-  // Helpers
-  // =========================
   function toNumber(v, fallback = 0) {
     const n = Number(String(v ?? "").trim());
     return Number.isFinite(n) ? n : fallback;
@@ -89,9 +86,6 @@
     }
   }
 
-  // =========================
-  // Grab elements
-  // =========================
   const price12 = document.getElementById("price12");
   const price16 = document.getElementById("price16");
 
@@ -106,17 +100,10 @@
   const productStatusPill = document.getElementById("productStatusPill");
   const saveBtn = document.getElementById("saveBtn");
 
-  // require token on page load
   requireAdminLogin();
 
-  // =========================
-  // Input restrictions
-  // =========================
   [price12, price16, addonPearlsPrice, addonGrahamPrice, addonMangoBitsPrice].forEach(enforceNumericInput);
 
-  // =========================
-  // Pill click toggle
-  // =========================
   if (productStatusPill) {
     productStatusPill.addEventListener("click", () => {
       const curr = getPillStatus(productStatusPill);
@@ -124,9 +111,6 @@
     });
   }
 
-  // =========================
-  // Addon toggles
-  // =========================
   function refreshAddonStates() {
     toggleAddonUI(addonPearlsToggle, addonPearlsPrice);
     toggleAddonUI(addonGrahamToggle, addonGrahamPrice);
@@ -140,9 +124,6 @@
 
   refreshAddonStates();
 
-  // =========================
-  // LOAD product config (public)
-  // =========================
   async function loadProduct() {
     try {
       const res = await fetch(`${API_BASE}/products/${SLUG}`, { method: "GET" });
@@ -169,9 +150,6 @@
 
   loadProduct();
 
-  // =========================
-  // SAVE update (secured)
-  // =========================
   async function saveUpdate() {
     const status = getPillStatus(productStatusPill);
 

@@ -1,4 +1,4 @@
-/* ===== GENERAL ===== */
+
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +15,6 @@ body {
   background-color: #ffffff;
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
@@ -88,7 +87,6 @@ body {
   background: #C0EDE4;
 }
 
-/* ===== LOGOUT BUTTON ===== */
 .logout {
   margin-top: auto;
   margin-bottom: 40px;
@@ -108,7 +106,6 @@ body {
   background: #B2E3D9;
 }
 
-/* ===== TOP MENU ===== */
 .top-menu {
   position: fixed;
   top: 0;
@@ -125,9 +122,8 @@ body {
   z-index: 100;
 }
 
-/* STATUS BOX */
 .status-box {
-  border: 2px solid #00B84A; /* toned down from neon */
+  border: 2px solid #00B84A;
   border-radius: 8px;
   background: #fff;
   padding: 10px 20px;
@@ -148,7 +144,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* TIME BOX */
 .time-box {
   display: flex;
   align-items: center;
@@ -159,7 +154,6 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== SALES OVERVIEW CONTENT ===== */
 .content {
   margin-left: var(--sidebar-w);
   padding: 24px 32px;
@@ -168,7 +162,6 @@ body {
   max-width: 100%;
 }
 
-/* Header */
 .sales-header {
   display: flex;
   justify-content: space-between;
@@ -196,7 +189,6 @@ body {
   white-space: nowrap;
 }
 
-/* GRAPH AREA */
 .graph-container {
   background: #ffffff;
   border: 1px solid #dcdcdc;
@@ -207,14 +199,12 @@ body {
   overflow: hidden;
 }
 
-/* Let Chart.js + container control size */
 #salesChart {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
 
-/*        ORDERS MANAGEMENT        */
 .orders-container {
   margin-top: 28px;
   width: 100%;
@@ -226,7 +216,6 @@ body {
   margin-bottom: 12px;
 }
 
-/* Table */
 .table-wrapper {
   background: white;
   padding: 0;
@@ -265,20 +254,16 @@ body {
   background: #fff;
 }
 
-/* Dropdown */
 .dropdown-content {
   display: none;
   background: #ffffff;
 
   padding: 18px 20px;
 
-  /* NEW: full border */
   border: 1px solid #d7e2dd;
 
-  /* NEW: separation */
   margin-bottom: 10px;
 
-  /* rounded bottom so it feels like a card */
   border-radius: 0 0 10px 10px;
 }
 
@@ -306,7 +291,6 @@ body {
   margin-bottom: 6px;
 }
 
-/* Delivery rider fields */
 .box input {
   width: 100%;
   padding: 7px;
@@ -344,7 +328,6 @@ body {
 }
 
 
-/* ===== SMALL RESPONSIVE FIX ===== */
 @media (max-width: 1100px) {
   .dropdown-grid {
     grid-template-columns: 1fr;
@@ -355,20 +338,17 @@ body {
   }
 }
 
-/* ✅ Sidebar flexibility */
 .sidebar {
-  overflow: hidden; /* prevents menu from overflowing outside */
+  overflow: hidden;
 }
 
-/* ✅ Menu should take remaining space and scroll if needed */
 .menu {
   flex: 1;
   overflow-y: auto;
-  margin-top: 30px; /* a bit smaller */
+  margin-top: 30px;
   padding-bottom: 10px;
 }
 
-/* optional: nicer scrollbar */
 .menu::-webkit-scrollbar {
   width: 6px;
 }

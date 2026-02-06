@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="users.css" />
 </head>
 <body>
-  <!-- Sidebar -->
+
   <div class="sidebar">
     <div class="logo-section">
       <img src="logo.png" alt="MiYummy Logo" class="logo" />
@@ -27,7 +27,6 @@
     <button class="logout" onclick="adminLogout()">Log out</button>
   </div>
 
-  <!-- Top Menu -->
   <div class="top-menu">
     <div class="status">
       <div class="status-box">
@@ -37,9 +36,7 @@
     <div id="clock" class="time-box"></div>
   </div>
 
-  <!-- MAIN CONTENT -->
   <div class="main-content">
-    <!-- Header row (title + search aligned) -->
     <div class="page-header">
       <h2>Users management</h2>
 
@@ -48,7 +45,6 @@
       </div>
     </div>
 
-    <!-- Table card -->
     <div class="table-card">
       <div class="table-scroll">
         <table class="users-table">
@@ -85,7 +81,7 @@
   </div>
 
   <script>
-    // Real-time clock
+
     function updateClock() {
       const now = new Date();
       let hours = now.getHours();
@@ -101,7 +97,6 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Logout
     function adminLogout() {
       if (confirm("Are you sure you want to log out?")) {
         window.location.href = "login.html";

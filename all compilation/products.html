@@ -8,7 +8,6 @@
 </head>
 
 <body>
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="logo-section">
       <img src="logo.png" alt="MiYummy Logo" class="logo">
@@ -28,7 +27,6 @@
     <button class="logout" onclick="adminLogout()">Log out</button>
   </div>
 
-  <!-- Top Menu -->
   <div class="top-menu">
     <div class="status">
       <div class="status-box">
@@ -39,7 +37,6 @@
     <div id="clock" class="time-box"></div>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <div class="page-header">
       <h1>Edit Products</h1>
@@ -69,16 +66,9 @@
       <button class="product-btn" onclick="window.location.href='edit-guyabano.html'">
         <img src="guyabanothumbnail.jpg" alt="Guyabano Flavor">
       </button>
-
-      <!-- OPTIONAL: Add Product button (if you want)
-      <button class="product-btn add-product" onclick="window.location.href='add-product.html'">
-        +
-      </button>
-      -->
     </div>
   </div>
 
-  <!-- Clock + Logout -->
   <script>
     function updateClock() {
       const now = new Date();
@@ -103,7 +93,6 @@
   </script>
 
   <script src="service-status.js"></script>
-  <!-- If your file is NOT inside /js folder, use products.js -->
   <script src="products.js" defer></script>
   <script src="logout.js" defer></script>
 </body>

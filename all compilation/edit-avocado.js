@@ -1,4 +1,4 @@
-// edit-avocado.js
+
 (function () {
   const API_BASE = "https://miyummybackend.onrender.com";
   const SLUG = "avocado";

@@ -1,24 +1,20 @@
-// products.js (SECURED PAGE GUARD)
+
 const ADMIN_TOKEN_KEY = "adminToken";
 
-// ✅ Vercel-safe login redirect
 
 function requireAdminLogin() {
   const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
-    // block page immediately
     goToLogin();
     return false;
   }
   return true;
 }
 
-// ✅ IMPORTANT: run guard on page load
 document.addEventListener("DOMContentLoaded", () => {
   requireAdminLogin();
 });
 
-// Handle product clicks
 function openProduct(productName) {
   if (!requireAdminLogin()) return;
 

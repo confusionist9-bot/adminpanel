@@ -1,4 +1,4 @@
-// ✅ use the API_BASE set by sales.js
+
 function getApiBase() {
   return window.API_BASE || "https://miyummybackend.onrender.com";
 }
@@ -7,7 +7,7 @@ async function getServiceStatus() {
   const res = await fetch(`${getApiBase()}/admin/service-status`);
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to load service status");
-  return data.status; // "active" | "inactive"
+  return data.status;
 }
 
 function applyServiceStatusUI(status) {
@@ -30,12 +30,10 @@ async function loadServiceStatus() {
     applyServiceStatusUI(status);
   } catch (e) {
     console.error(e.message);
-    // safest fallback (optional)
     applyServiceStatusUI("inactive");
   }
 }
 
-// ✅ expose so sales.js can call it after toggling
 window.loadServiceStatus = loadServiceStatus;
 
 document.addEventListener("DOMContentLoaded", () => {

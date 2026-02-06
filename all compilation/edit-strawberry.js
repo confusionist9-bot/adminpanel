@@ -1,4 +1,4 @@
-// edit-strawberry.js
+
 (function () {
   const API_BASE = "https://miyummybackend.onrender.com";
   const SLUG = "strawberry";

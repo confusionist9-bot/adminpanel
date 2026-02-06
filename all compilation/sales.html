@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="sales.css">
 </head>
 <body>
-  <!-- Sidebar -->
+
   <div class="sidebar">
     <div class="logo-section">
       <img src="logo.png" alt="MiYummy Logo" class="logo">
@@ -23,12 +23,11 @@
 </nav>
 
 
-    <!-- ✅ Log out button -->
+
     <button class="logout" onclick="adminLogout()">
       Log out
     </button>
   </div>
-    <!-- Top Menu -->
   <div class="top-menu">
     <div class="status">
       <div class="status-box">
@@ -39,7 +38,7 @@
   </div>
 
     <script>
-  // ✅ Real-time clock
+
   function updateClock() {
     const now = new Date();
     let hours = now.getHours();
@@ -56,7 +55,6 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // ✅ Logout button
   function adminLogout() {
     if (confirm("Are you sure you want to log out?")) {
       window.location.href = "login.html";
@@ -64,8 +62,6 @@
   }
   </script>
   
-
-  <!-- Sales Overview Content -->
   <div class="content">
     <div class="sales-header">
       <div class="left-header">
@@ -74,15 +70,9 @@
       </div>
       <p class="total-sales" id="totalSalesDisplay">Total Sales: ₱0.00</p>
     </div>
-    
-
-    <!-- GRAPH AREA -->
     <div class="graph-container">
       <canvas id="salesChart"></canvas>
     </div>
-
-    <!--       ORDERS MANAGEMENT       -->
-  
     <div class="orders-container">
       <h2 class="orders-title">Orders Management</h2>
 
@@ -93,12 +83,9 @@
           <div>Order amount</div>
           <div>Order status</div>
         </div>
-
-      <!-- ✅ rows will be injected by sales.js -->
       </div>
 
     </div>
-    <!-- END ORDERS SECTION -->
   </div>
 
 <script src="service-status.js"></script>

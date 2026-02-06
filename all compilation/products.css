@@ -1,4 +1,4 @@
-/* ===== GENERAL ===== */
+
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +15,6 @@ body {
   background-color: #ffffff;
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
@@ -58,7 +57,6 @@ body {
   text-align: center;
 }
 
-/* MENU */
 .menu {
   margin-top: 50px;
   width: 100%;
@@ -91,7 +89,6 @@ body {
   background: #C0EDE4;
 }
 
-/* LOGOUT */
 .logout {
   margin-top: auto;
   margin-bottom: 40px;
@@ -109,7 +106,6 @@ body {
   background: #B2E3D9;
 }
 
-/* ===== TOP MENU ===== */
 .top-menu {
   position: fixed;
   top: 0;
@@ -127,7 +123,6 @@ body {
   z-index: 100;
 }
 
-/* STATUS BOX */
 .status-box {
   border: 3px solid #00FF04;
   border-radius: 8px;
@@ -147,7 +142,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* TIME BOX */
 .time-box {
   display: flex;
   align-items: center;
@@ -158,7 +152,6 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== MAIN CONTENT ===== */
 .main-content {
   margin-left: var(--sidebar-w);
   padding: 24px 32px;
@@ -172,14 +165,12 @@ body {
   margin-bottom: 16px;
 }
 
-/* ===== PRODUCT GRID ===== */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
 }
 
-/* ⛔ UNCHANGED: original product button style */
 .product-btn {
   background: none;
   border: none;
@@ -197,7 +188,6 @@ body {
   box-shadow: 0 6px 6px rgba(0,0,0,0.25);
 }
 
-/* ===== ADD PRODUCT CARD (OPTIONAL) ===== */
 .add-btn {
   background: #D9D9D9;
   border: none;
@@ -218,7 +208,6 @@ body {
   background: #b5b5b5;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -235,20 +224,17 @@ body {
   }
 }
 
-/* ✅ Sidebar flexibility */
 .sidebar {
-  overflow: hidden; /* prevents menu from overflowing outside */
+  overflow: hidden;
 }
 
-/* ✅ Menu should take remaining space and scroll if needed */
 .menu {
   flex: 1;
   overflow-y: auto;
-  margin-top: 30px; /* a bit smaller */
+  margin-top: 30px;
   padding-bottom: 10px;
 }
 
-/* optional: nicer scrollbar */
 .menu::-webkit-scrollbar {
   width: 6px;
 }

@@ -3,9 +3,8 @@ window.API_BASE = API_BASE;
 
 const ADMIN_TOKEN_KEY = "adminToken";
 
-// ✅ always send user back to Vercel home (index.html)
 function goToLogin() {
-  window.location.href = "/"; // ✅ IMPORTANT: Vercel login page is /
+  window.location.href = "/";
 }
 
 function requireAdminLogin() {
@@ -17,7 +16,6 @@ function requireAdminLogin() {
   return token;
 }
 
-// ✅ call this on logout button
 function adminLogout() {
   localStorage.removeItem(ADMIN_TOKEN_KEY);
   goToLogin();
@@ -39,7 +37,6 @@ async function apiFetch(path, options = {}) {
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
-  // safer parsing (won't crash on empty/non-json)
   const raw = await res.text();
   let data = {};
   try { data = JSON.parse(raw); } catch {}
@@ -50,17 +47,12 @@ async function apiFetch(path, options = {}) {
 
 let salesChartInstance = null;
 
-// ✅ AUTO REFRESH SETTINGS
-const REFRESH_INTERVAL = 5000; // 5 seconds
+const REFRESH_INTERVAL = 5000;
 let lastOrdersSignature = "";
-
-/* ------------------------------
-   SERVICE STATUS (SERVER-BASED)
---------------------------------*/
 
 async function getServiceStatus() {
   const data = await apiFetch(`/admin/service-status`);
-  return data.status; // "active" | "inactive"
+  return data.status;
 }
 
 async function setServiceStatus(status) {
@@ -71,7 +63,6 @@ async function setServiceStatus(status) {
   return data.status;
 }
 
-// click handler for the green/red service box
 document.addEventListener("DOMContentLoaded", function () {
   requireAdminLogin();
 
@@ -165,7 +156,6 @@ function updateDayRangeLabel() {
   label.textContent = `${formatDayTime(start)} to ${formatDayTime(end)} (resets at 24:00)`;
 }
 
-// ✅ prevent refresh while admin is typing
 function isAdminInteracting() {
   const el = document.activeElement;
   if (!el) return false;
@@ -173,7 +163,6 @@ function isAdminInteracting() {
   return tag === "input" || tag === "select" || tag === "textarea";
 }
 
-// ✅ signature to detect real changes (address, status, rider)
 function buildOrdersSignature(orders) {
   return orders
     .map((o) =>
@@ -192,9 +181,6 @@ function buildOrdersSignature(orders) {
     .join("||");
 }
 
-/* ------------------------------
-   SALES (GRAPH)
---------------------------------*/
 
 async function fetchFlavorSales() {
   return await apiFetch(`/admin/sales/flavors`);
@@ -238,10 +224,6 @@ async function renderSalesChart() {
     },
   });
 }
-
-/* ------------------------------
-   ORDERS (MANAGEMENT)
---------------------------------*/
 
 async function fetchOrders() {
   return await apiFetch(`/admin/orders`);
@@ -365,10 +347,6 @@ async function renderOrders(force = false) {
     });
   });
 }
-
-/* ------------------------------
-   AUTO REFRESH LOOP
---------------------------------*/
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {

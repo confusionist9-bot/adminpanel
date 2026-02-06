@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // =========================
-  // CONFIG
-  // =========================
+
   const API_BASE = "https://miyummybackend.onrender.com";
   const EDIT_ID_KEY = "editBranchId";
 
@@ -35,9 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
 
-  // =========================
-  // CLOCK (optional)
-  // =========================
   function updateClock() {
     const el = document.getElementById("clock");
     if (!el) return;
@@ -54,9 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateClock();
   setInterval(updateClock, 1000);
 
-  // =========================
-  // TIME HELPERS (display only)
-  // =========================
   function timeToMinutes(time) {
     const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
@@ -82,17 +74,12 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Cannot save changes.\n\nPlease complete all fields correctly.");
   }
 
-  // =========================
-  // API HELPERS
-  // =========================
-  // Public list
   async function apiGetBranches() {
     const res = await fetch(`${API_BASE}/branches`);
     if (!res.ok) throw new Error(`Failed to load branches (${res.status})`);
     return await res.json();
   }
 
-  // Admin actions (secured)
   async function apiCreateBranch(payload) {
     return await apiFetch(`/admin/branches`, {
       method: "POST",
@@ -113,11 +100,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =========================
-  // RENDER (branches.html)
-  // =========================
   async function renderBranches() {
-    // require admin token for this page
+
     requireAdminLogin();
 
     const list = document.getElementById("branchesList");
@@ -201,11 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =========================
-  // CLICK HANDLERS
-  // =========================
   document.addEventListener("click", async (e) => {
-    // EDIT
     const editBtn = e.target.closest(".edit-btn");
     if (editBtn) {
       const card = editBtn.closest(".branch-card");
@@ -217,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // DELETE
     const deleteBtn = e.target.closest(".delete-btn");
     if (deleteBtn) {
       const card = deleteBtn.closest(".branch-card");
@@ -236,7 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // TOGGLE ACTIVE/INACTIVE
     const statusBtn = e.target.closest(".status-btn");
     if (statusBtn) {
       const card = statusBtn.closest(".branch-card");
@@ -260,9 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // =========================
-  // ADD BRANCH (add-branch.html)
-  // =========================
   const saveBranchBtn = document.getElementById("saveBranch");
   if (saveBranchBtn) {
     requireAdminLogin();
@@ -307,9 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =========================
-  // EDIT BRANCH (edit-branch.html)
-  // =========================
   const saveChangesBtn = document.getElementById("saveChanges");
   if (saveChangesBtn) {
     requireAdminLogin();
@@ -376,14 +348,8 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
   }
 
-  // =========================
-  // INIT
-  // =========================
   renderBranches();
 
-  // =========================
-  // SMALL UTIL
-  // =========================
   function escapeHtml(str) {
     return String(str ?? "")
       .replace(/&/g, "&amp;")

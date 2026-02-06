@@ -1,4 +1,4 @@
-/* ===== GENERAL ===== */
+
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +15,6 @@ body {
   background-color: #ffffff;
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
@@ -58,7 +57,6 @@ body {
   text-align: center;
 }
 
-/* MENU */
 .menu {
   margin-top: 50px;
   width: 100%;
@@ -93,7 +91,6 @@ body {
   background: #C0EDE4;
 }
 
-/* LOGOUT */
 .logout {
   margin-top: auto;
   margin-bottom: 40px;
@@ -116,7 +113,6 @@ body {
   background: #B2E3D9;
 }
 
-/* ===== TOP MENU ===== */
 .top-menu {
   position: fixed;
   top: 0;
@@ -170,7 +166,6 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== MAIN CONTENT ===== */
 .main-content {
   margin-left: var(--sidebar-w);
   padding: 24px 32px;
@@ -186,7 +181,6 @@ body {
   margin: 0 auto;
 }
 
-/* ===== HEADER ===== */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -226,7 +220,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/* PRODUCT STATUS */
 .product-status {
   display: flex;
   align-items: center;
@@ -270,7 +263,6 @@ body {
   box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.06);
 }
 
-/* ===== CARD ===== */
 .card.general-info {
   background: #fff;
   padding: 28px;
@@ -288,7 +280,6 @@ body {
   color: #232b2b;
 }
 
-/* FORM */
 .field-label {
   display: block;
   font-size: 14px;
@@ -318,7 +309,6 @@ body {
   resize: vertical;
 }
 
-/* GRID */
 .grid-two {
   display: flex;
   gap: 28px;
@@ -346,7 +336,6 @@ body {
   flex: 1;
 }
 
-/* ADDONS */
 .section-label {
   font-size: 14px;
   color: #666;
@@ -374,7 +363,6 @@ body {
   width: 130px;
 }
 
-/* SWITCH */
 .switch {
   position: relative;
   width: 46px;
@@ -421,7 +409,6 @@ body {
   transform: translateX(20px);
 }
 
-/* CARD ACTIONS */
 .card-actions {
   display: flex;
   justify-content: flex-end;
@@ -447,7 +434,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* RESPONSIVE */
 @media (max-width: 1000px) {
   .grid-two {
     flex-direction: column;
@@ -471,20 +457,17 @@ body {
   }
 }
 
-/* ✅ Sidebar flexibility */
 .sidebar {
-  overflow: hidden; /* prevents menu from overflowing outside */
+  overflow: hidden;
 }
 
-/* ✅ Menu should take remaining space and scroll if needed */
 .menu {
   flex: 1;
   overflow-y: auto;
-  margin-top: 30px; /* a bit smaller */
+  margin-top: 30px;
   padding-bottom: 10px;
 }
 
-/* optional: nicer scrollbar */
 .menu::-webkit-scrollbar {
   width: 6px;
 }

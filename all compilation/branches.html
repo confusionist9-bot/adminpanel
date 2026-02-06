@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="branches.css">
 </head>
 <body>
-  <!-- Sidebar -->
+
   <div class="sidebar">
     <div class="logo-section">
       <img src="logo.png" alt="MiYummy Logo" class="logo">
@@ -22,13 +22,11 @@
   <a href="branches.html"  class="active">Branches</a>
 </nav>
 
-    <!-- ✅ Log out button -->
     <button class="logout" onclick="adminLogout()">
       Log out
     </button>
   </div>
 
-  <!-- Top Menu -->
   <div class="top-menu">
     <div class="status">
       <div class="status-box">
@@ -39,7 +37,7 @@
   </div>
 
   <script>
-  // ✅ Real-time clock
+
   function updateClock() {
     const now = new Date();
     let hours = now.getHours();
@@ -62,20 +60,17 @@
   </script>
 
 
-<!-- ===== MAIN CONTENT ===== -->
 <div class="main-content">
   <h1 class="page-title">Branches</h1>
 
-  <!-- JS will render branch cards here -->
   <div id="branchesList"></div>
 
-  <!-- Add Branch -->
   <a href="add-branch.html" class="add-branch-card">+</a>
 </div>
 
 
 
- <script src="service-status.js"></script> <!-- this is for the service status toggle -->
+ <script src="service-status.js"></script>
   <script src="branches.js"></script>
   <script src="logout.js" defer></script>
 </body>

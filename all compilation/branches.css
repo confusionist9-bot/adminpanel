@@ -1,4 +1,3 @@
-/* ===== GENERAL ===== */
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +14,6 @@ body {
   background-color: #ffffff;
 }
 
-/* ===== SIDEBAR ===== */
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
@@ -89,7 +87,6 @@ body {
   background: #C0EDE4;
 }
 
-/* ===== LOGOUT BUTTON ===== */
 .logout {
   margin-top: auto;
   margin-bottom: 40px;
@@ -108,7 +105,6 @@ body {
   background: #B2E3D9;
 }
 
-/* ===== TOP MENU ===== */
 .top-menu {
   position: fixed;
   top: 0;
@@ -125,7 +121,6 @@ body {
   z-index: 100;
 }
 
-/* STATUS BOX */
 .status-box {
   border: 3px solid #00FF04;
   border-radius: 8px;
@@ -145,7 +140,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* TIME BOX */
 .time-box {
   display: flex;
   align-items: center;
@@ -156,7 +150,6 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== MAIN CONTENT AREA ===== */
 .main-content {
   margin-left: var(--sidebar-w);
   padding: 24px 32px;
@@ -164,14 +157,12 @@ body {
   min-height: 100vh;
 }
 
-/* TITLE */
 .page-title {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 18px;
 }
 
-/* List container spacing */
 #branchesList {
   display: flex;
   flex-direction: column;
@@ -179,7 +170,6 @@ body {
   margin-bottom: 14px;
 }
 
-/* BRANCH CARD */
 .branch-card {
   background: #F2F3F1;
   border-radius: 16px;
@@ -191,7 +181,6 @@ body {
   border: 1px solid #e3e6e2;
 }
 
-/* DELETE ICON BUTTON (single source of truth) */
 .delete-btn {
   background: none;
   border: none;
@@ -217,10 +206,9 @@ body {
   transform: scale(1.15);
 }
 
-/* INFO */
 .branch-info {
   flex: 1;
-  min-width: 0; /* prevents overflow on long text */
+  min-width: 0;
 }
 
 .branch-info h3 {
@@ -240,7 +228,6 @@ body {
   color: #777;
 }
 
-/* ACTIONS */
 .branch-actions {
   display: flex;
   gap: 10px;
@@ -260,7 +247,6 @@ body {
   background: #f7f7f7;
 }
 
-/* STATUS BUTTON */
 .status-btn {
   padding: 8px 16px;
   border-radius: 10px;
@@ -278,7 +264,6 @@ body {
   border-radius: 50%;
 }
 
-/* OPEN */
 .status-btn.open {
   background: #C8F3D2;
 }
@@ -287,7 +272,6 @@ body {
   background: green;
 }
 
-/* INACTIVE */
 .status-btn.inactive {
   background: #E8A5A5;
 }
@@ -296,8 +280,6 @@ body {
   background: red;
 }
 
-
-/* ADD BRANCH */
 .add-branch-card {
   height: 84px;
   border: 3px dashed #ddd;
@@ -317,7 +299,6 @@ body {
   border-color: #cfcfcf;
 }
 
-/* ===== FORM CARD (for add/edit pages) ===== */
 .form-card {
   background: #F2F3F1;
   padding: 30px;
@@ -369,7 +350,6 @@ body {
   cursor: pointer;
 }
 
-/* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .branch-card {
     flex-direction: column;
@@ -386,20 +366,17 @@ body {
   }
 }
 
-/* ✅ Sidebar flexibility */
 .sidebar {
-  overflow: hidden; /* prevents menu from overflowing outside */
+  overflow: hidden;
 }
 
-/* ✅ Menu should take remaining space and scroll if needed */
 .menu {
   flex: 1;
   overflow-y: auto;
-  margin-top: 30px; /* a bit smaller */
+  margin-top: 30px;
   padding-bottom: 10px;
 }
 
-/* optional: nicer scrollbar */
 .menu::-webkit-scrollbar {
   width: 6px;
 }

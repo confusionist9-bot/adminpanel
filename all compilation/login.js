@@ -1,7 +1,6 @@
-const API_BASE = "https://miyummybackend.onrender.com"; // ✅ Render base URL (no trailing slash)
+const API_BASE = "https://miyummybackend.onrender.com";
 const ADMIN_TOKEN_KEY = "adminToken";
 
-// DOM
 const loginBtn = document.getElementById("loginBtn");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
@@ -9,7 +8,6 @@ const errorMessage = document.getElementById("error-message");
 const togglePassword = document.getElementById("togglePassword");
 const eyeIcon = document.getElementById("eyeIcon");
 
-// If already logged in, go to dashboard
 if (localStorage.getItem(ADMIN_TOKEN_KEY)) {
   window.location.href = "sales.html";
 }
@@ -24,41 +22,35 @@ async function postJson(path, bodyObj) {
 
   const raw = await res.text();
   let data = null;
-  try { data = JSON.parse(raw); } catch { /* keep null */ }
+  try { data = JSON.parse(raw); } catch {}
 
   return { res, raw, data };
 }
 
-/**
- * ✅ Admin login (robust)
- * 1) Try /auth/admin-login (preferred)
- * 2) If backend doesn't have it (404), fallback to /auth/login + check isAdmin
- */
 async function adminLogin(identifier, password) {
-  // 1) Try admin-login endpoint
+
   const first = await postJson("/auth/admin-login", { identifier, password });
 
   console.log("ADMIN LOGIN (admin-login) STATUS:", first.res.status);
   console.log("ADMIN LOGIN (admin-login) RAW:", first.raw);
 
   if (first.res.ok) {
-    // Expect token in response
+
     const token = first.data?.token;
     if (!token) throw new Error("Login succeeded but token missing.");
     return token;
   }
 
-  // If backend route is missing, fallback to /auth/login
   const looksLikeRouteMissing =
     first.res.status === 404 ||
     (first.raw && first.raw.includes("Cannot POST /auth/admin-login"));
 
   if (!looksLikeRouteMissing) {
-    // Not a 404 route-missing => show real error
+
     throw new Error(first.data?.message || first.raw || `Login failed (${first.res.status})`);
   }
 
-  // 2) Fallback: normal login
+
   const second = await postJson("/auth/login", { identifier, password });
 
   console.log("ADMIN LOGIN (fallback /login) STATUS:", second.res.status);
@@ -68,7 +60,7 @@ async function adminLogin(identifier, password) {
     throw new Error(second.data?.message || second.raw || `Login failed (${second.res.status})`);
   }
 
-  // Must be admin
+
   const token = second.data?.token;
   const user = second.data?.user;
 
@@ -84,7 +76,7 @@ loginBtn.addEventListener("click", async function () {
   errorMessage.textContent = "";
 
   const identifier = usernameInput.value.trim();
-  const password = passwordInput.value; // don't trim password
+  const password = passwordInput.value;
 
   if (!identifier || !password) {
     errorMessage.textContent = "Please enter username/email and password.";
@@ -108,12 +100,10 @@ loginBtn.addEventListener("click", async function () {
   }
 });
 
-// Enter key triggers login
 document.addEventListener("keydown", function (event) {
   if (event.key === "Enter") loginBtn.click();
 });
 
-// Toggle password visibility
 togglePassword.addEventListener("click", function () {
   const isPasswordHidden = passwordInput.type === "password";
   passwordInput.type = isPasswordHidden ? "text" : "password";

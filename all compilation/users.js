@@ -1,4 +1,4 @@
-// users.js (SECURED)
+
 const API_BASE = "https://miyummybackend.onrender.com";
 const ADMIN_TOKEN_KEY = "adminToken";
 
@@ -27,7 +27,6 @@ async function apiFetch(path, options = {}) {
   if (!res.ok) {
     console.error("❌ Failed:", res.status, body);
 
-    // if token is missing/invalid/expired -> force re-login
     if (res.status === 401 || res.status === 403) {
       localStorage.removeItem(ADMIN_TOKEN_KEY);
       window.location.href = "login.html";
@@ -79,12 +78,10 @@ function escapeHtml(str) {
   }[m]));
 }
 
-// placeholder
 function deleteUser(id) {
   alert("Delete not implemented yet: " + id);
 }
 
-// Search
 document.getElementById("searchInput").addEventListener("input", function () {
   const value = this.value.toLowerCase();
   document.querySelectorAll("#usersTableBody tr").forEach((row) => {
@@ -92,6 +89,5 @@ document.getElementById("searchInput").addEventListener("input", function () {
   });
 });
 
-// ✅ block page open without token
 requireAdminLogin();
 loadUsers();
