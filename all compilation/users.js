@@ -1,4 +1,3 @@
-
 const API_BASE = "https://miyummybackend.onrender.com";
 const ADMIN_TOKEN_KEY = "adminToken";
 
@@ -6,7 +5,7 @@ function requireAdminLogin() {
   const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
     window.location.href = "login.html";
-    throw new Error("Not logged in");
+    throw new Error("Admin token missing");
   }
   return token;
 }
@@ -16,78 +15,109 @@ async function apiFetch(path, options = {}) {
 
   const headers = {
     ...(options.headers || {}),
-    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`
   };
 
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
 
-  const contentType = res.headers.get("content-type") || "";
-  const body = contentType.includes("application/json") ? await res.json() : await res.text();
+  let body = null;
+  try {
+    body = await res.json();
+  } catch (e) {
+    // ignore
+  }
 
   if (!res.ok) {
-    console.error("❌ Failed:", res.status, body);
-
-    if (res.status === 401 || res.status === 403) {
-      localStorage.removeItem(ADMIN_TOKEN_KEY);
-      window.location.href = "login.html";
-      return null;
-    }
-
-    alert(`Failed (${res.status})\n${body?.message || body || ""}`);
+    alert((body && body.message) ? body.message : `Request failed (${res.status})`);
     return null;
   }
 
   return body;
 }
 
-async function loadUsers() {
-  const users = await apiFetch("/admin/users");
-  if (!users) return;
-  renderUsers(Array.isArray(users) ? users : []);
-}
-
-function renderUsers(users) {
-  const tbody = document.getElementById("usersTableBody");
-  tbody.innerHTML = "";
-
-  if (!users.length) {
-    tbody.innerHTML = `<tr><td colspan="5">No users found.</td></tr>`;
-    return;
-  }
-
-  users.forEach((u) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${escapeHtml(u.firstName || "")} ${escapeHtml(u.lastName || "")}</td>
-      <td><a href="mailto:${escapeHtml(u.email || "")}">${escapeHtml(u.email || "")}</a></td>
-      <td>${escapeHtml(u.username || "")}</td>
-      <td>${escapeHtml(u.mobile || "")}</td>
-      <td><button class="delete-btn" onclick="deleteUser('${u._id}')">Delete</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
 function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, (m) => ({
+  return String(str ?? "").replace(/[&<>"']/g, (m) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
-    "'": "&#039;",
+    "'": "&#039;"
   }[m]));
 }
 
-function deleteUser(id) {
-  alert("Delete not implemented yet: " + id);
+function matchesSearch(u, q) {
+  const text = `${u.firstName} ${u.lastName} ${u.email} ${u.username} ${u.mobile}`.toLowerCase();
+  return text.includes(q);
 }
 
-document.getElementById("searchInput").addEventListener("input", function () {
-  const value = this.value.toLowerCase();
-  document.querySelectorAll("#usersTableBody tr").forEach((row) => {
-    row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
-  });
-});
+function renderUsers(users) {
+  const tbody = document.getElementById("usersTableBody");
+  const searchInput = document.getElementById("searchInput");
+  const q = (searchInput?.value || "").trim().toLowerCase();
 
-requireAdminLogin();
-loadUsers();
+  const filtered = q ? users.filter(u => matchesSearch(u, q)) : users;
+
+  tbody.innerHTML = "";
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5">No users found.</td></tr>`;
+    return;
+  }
+
+  filtered.forEach((u) => {
+    const isBanned = !!u.isBanned;
+
+    const btnLabel = isBanned ? "Unban" : "Ban";
+    const btnClass = isBanned ? "unban-btn" : "ban-btn";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(u.firstName)} ${escapeHtml(u.lastName)}</td>
+      <td><a href="mailto:${escapeHtml(u.email)}">${escapeHtml(u.email)}</a></td>
+      <td>${escapeHtml(u.username)}</td>
+      <td>${escapeHtml(u.mobile)}</td>
+      <td>
+        <button class="${btnClass}" onclick="toggleBan('${u._id}', ${isBanned})">
+          ${btnLabel}
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+let USERS_CACHE = [];
+
+async function loadUsers() {
+  const users = await apiFetch("/admin/users", { method: "GET" });
+  if (!users) return;
+
+  USERS_CACHE = users;
+  renderUsers(USERS_CACHE);
+}
+
+async function toggleBan(userId, currentlyBanned) {
+  const actionText = currentlyBanned ? "unban" : "ban";
+  const ok = confirm(`Are you sure you want to ${actionText} this user?`);
+  if (!ok) return;
+
+  const result = await apiFetch(`/admin/users/${userId}/ban`, {
+    method: "PATCH"
+  });
+
+  if (!result) return;
+  await loadUsers();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  requireAdminLogin();
+
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => renderUsers(USERS_CACHE));
+  }
+
+  loadUsers();
+});
