@@ -51,10 +51,11 @@ const REFRESH_INTERVAL = 5000;
 let lastOrdersSignature = "";
 let lastSalesSignature = "";
 
-let currentView = "monthly"; // "monthly" | "weekly"
+// "monthly" | "weekly" | "daily"
+let currentView = "monthly";
 
 /* =========================
-   SERVICE STATUS (same)
+   SERVICE STATUS
 ========================= */
 async function getServiceStatus() {
   const data = await apiFetch(`/admin/service-status`);
@@ -105,6 +106,10 @@ document.addEventListener("DOMContentLoaded", function () {
 ========================= */
 function money(n) {
   return `₱${Number(n || 0).toFixed(2)}`;
+}
+
+function pesoCompact(value) {
+  return Number(value || 0).toLocaleString("en-PH");
 }
 
 function formatDateTime(ms) {
@@ -164,10 +169,6 @@ function buildOrdersSignature(orders) {
     .join("||");
 }
 
-function pesoCompact(value) {
-  return Number(value || 0).toLocaleString("en-PH");
-}
-
 function hexToRgba(hex, alpha) {
   const h = hex.replace("#", "");
   const r = parseInt(h.substring(0, 2), 16);
@@ -207,7 +208,7 @@ function updateYearToDateLabel() {
 }
 
 /* =========================
-   DATA: MONTHLY + WEEKLY
+   ORDERS FETCH + TIMESTAMP
 ========================= */
 async function fetchOrders() {
   return await apiFetch(`/admin/orders`);
@@ -219,25 +220,22 @@ function pickOrderTimestamp(o) {
   return Number.isFinite(ms) ? ms : null;
 }
 
-function buildMonthlyBuckets() {
+/* =========================
+   MONTHLY COMPUTE (cumulative)
+========================= */
+function computeMonthly(orders) {
   const { now } = getYearToDateRange();
   const year = now.getFullYear();
   const currentMonthIndex = now.getMonth();
 
   const labels = [];
   const monthKeys = [];
-
   for (let m = 0; m <= currentMonthIndex; m++) {
     const d = new Date(year, m, 1);
     labels.push(d.toLocaleString("en-PH", { month: "short" }));
     monthKeys.push(`${year}-${String(m + 1).padStart(2, "0")}`);
   }
 
-  return { labels, monthKeys, year };
-}
-
-function computeMonthly(orders) {
-  const { labels, monthKeys, year } = buildMonthlyBuckets();
   const totalsByMonth = Object.fromEntries(monthKeys.map((k) => [k, 0]));
 
   orders.forEach((o) => {
@@ -256,24 +254,22 @@ function computeMonthly(orders) {
     totalsByMonth[key] += Number(o.total || 0);
   });
 
-  const monthlySeries = monthKeys.map((k) => Number(totalsByMonth[k] || 0));
+  const monthlyTotals = monthKeys.map((k) => Number(totalsByMonth[k] || 0));
 
   let running = 0;
-  const cumulativeSeries = monthlySeries.map((v) => {
+  const cumulative = monthlyTotals.map((v) => {
     running += v;
     return running;
   });
 
-  return {
-    labels,
-    series: cumulativeSeries, // area = cumulative YTD
-    grandTotal: running,
-    tooltipRanges: null
-  };
+  return { labels, series: cumulative, grandTotal: running, tooltipRanges: null };
 }
 
+/* =========================
+   WEEKLY COMPUTE (cumulative)
+========================= */
 function fmtShort(d) {
-  return d.toLocaleDateString("en-PH", { month: "short", day: "2-digit" }); // Feb 13
+  return d.toLocaleDateString("en-PH", { month: "short", day: "2-digit" });
 }
 
 function computeWeekly(orders) {
@@ -294,7 +290,6 @@ function computeWeekly(orders) {
     const wStart = new Date(startMs + i * weekMs);
     const wEnd = new Date(Math.min(startMs + (i + 1) * weekMs - 1, nowMs));
 
-    // label = week start (clean + short)
     labels.push(fmtShort(wStart));
     tooltipRanges.push(`${fmtShort(wStart)} – ${fmtShort(wEnd)}`);
   }
@@ -316,50 +311,107 @@ function computeWeekly(orders) {
     weeklyTotals[idx] += Number(o.total || 0);
   });
 
-  // cumulative weekly YTD (area)
   let running = 0;
-  const cumulativeSeries = weeklyTotals.map((v) => {
+  const cumulative = weeklyTotals.map((v) => {
     running += v;
     return running;
   });
 
-  return {
-    labels,
-    series: cumulativeSeries,
-    grandTotal: running,
-    tooltipRanges
-  };
+  return { labels, series: cumulative, grandTotal: running, tooltipRanges };
 }
 
 /* =========================
-   CHART RENDER (AREA)
+   DAILY COMPUTE (cumulative)
+========================= */
+function computeDaily(orders) {
+  const { start, now } = getYearToDateRange();
+  const year = now.getFullYear();
+
+  const startMs = start.getTime();
+  const nowMs = now.getTime();
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  const daysCount = Math.floor((nowMs - startMs) / dayMs) + 1;
+
+  const dailyTotals = new Array(daysCount).fill(0);
+  const labels = [];
+
+  for (let i = 0; i < daysCount; i++) {
+    const d = new Date(startMs + i * dayMs);
+    labels.push(
+      d.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+      })
+    );
+  }
+
+  orders.forEach((o) => {
+    const status = String(o.status || "").trim();
+    if (status !== "Delivered") return;
+
+    const ms = pickOrderTimestamp(o);
+    if (!ms) return;
+
+    const d = new Date(ms);
+    if (d.getFullYear() !== year) return;
+    if (ms < startMs || ms > nowMs) return;
+
+    const idx = Math.floor((ms - startMs) / dayMs);
+    if (idx < 0 || idx >= dailyTotals.length) return;
+
+    dailyTotals[idx] += Number(o.total || 0);
+  });
+
+  let running = 0;
+  const cumulative = dailyTotals.map((v) => {
+    running += v;
+    return running;
+  });
+
+  return { labels, series: cumulative, grandTotal: running, tooltipRanges: null };
+}
+
+/* =========================
+   BUTTON UI
 ========================= */
 function setActiveButton(view) {
   const btnMonthly = document.getElementById("btnMonthly");
   const btnWeekly = document.getElementById("btnWeekly");
+  const btnDaily = document.getElementById("btnDaily");
   const title = document.getElementById("salesTitle");
 
   if (title) {
-    title.textContent = view === "weekly"
-      ? "Sales Overview (Weekly YTD)"
-      : "Sales Overview (Monthly YTD)";
+    if (view === "weekly") title.textContent = "Sales Overview (Weekly YTD)";
+    else if (view === "daily") title.textContent = "Sales Overview (Daily YTD)";
+    else title.textContent = "Sales Overview (Monthly YTD)";
   }
 
-  if (!btnMonthly || !btnWeekly) return;
+  const reset = (btn) => {
+    if (!btn) return;
+    btn.style.background = "white";
+    btn.style.color = "#1f2b2a";
+  };
 
-  if (view === "weekly") {
-    btnWeekly.style.background = "#94bbb4";
-    btnWeekly.style.color = "white";
-    btnMonthly.style.background = "white";
-    btnMonthly.style.color = "#1f2b2a";
-  } else {
-    btnMonthly.style.background = "#94bbb4";
-    btnMonthly.style.color = "white";
-    btnWeekly.style.background = "white";
-    btnWeekly.style.color = "#1f2b2a";
+  reset(btnMonthly);
+  reset(btnWeekly);
+  reset(btnDaily);
+
+  const active =
+    view === "weekly" ? btnWeekly :
+    view === "daily" ? btnDaily :
+    btnMonthly;
+
+  if (active) {
+    active.style.background = "#94bbb4";
+    active.style.color = "white";
   }
 }
 
+/* =========================
+   CHART RENDER (AREA)
+   - Legend removed
+========================= */
 async function renderSalesAreaChart(force = false) {
   const canvas = document.getElementById("salesChart");
   if (!canvas) return;
@@ -369,13 +421,13 @@ async function renderSalesAreaChart(force = false) {
   const orders = await fetchOrders();
   const signature = buildOrdersSignature(orders);
 
-  // avoid re-drawing chart if nothing changed
   if (!force && signature === lastSalesSignature) return;
   lastSalesSignature = signature;
 
-  const computed = currentView === "weekly"
-    ? computeWeekly(orders)
-    : computeMonthly(orders);
+  let computed;
+  if (currentView === "weekly") computed = computeWeekly(orders);
+  else if (currentView === "daily") computed = computeDaily(orders);
+  else computed = computeMonthly(orders);
 
   if (totalSalesDisplay) {
     totalSalesDisplay.textContent = `Total Sales (YTD): ${money(computed.grandTotal)}`;
@@ -389,6 +441,12 @@ async function renderSalesAreaChart(force = false) {
   const lineColor = "#94bbb4";
   const fillColor = hexToRgba("#D9EEEA", 0.85);
 
+  const manyPoints = computed.labels.length > 70;
+  const pointRadius =
+    currentView === "weekly" ? 2 :
+    currentView === "daily" ? (manyPoints ? 0 : 2) :
+    4;
+
   salesChartInstance = new Chart(canvas, {
     type: "line",
     data: {
@@ -401,8 +459,8 @@ async function renderSalesAreaChart(force = false) {
           backgroundColor: fillColor,
           fill: true,
           tension: 0.35,
-          pointRadius: currentView === "weekly" ? 2 : 4,
-          pointHoverRadius: currentView === "weekly" ? 4 : 6,
+          pointRadius,
+          pointHoverRadius: pointRadius === 0 ? 3 : 6,
           pointBackgroundColor: lineColor,
           pointBorderColor: "#ffffff",
           pointBorderWidth: 2,
@@ -414,26 +472,34 @@ async function renderSalesAreaChart(force = false) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
+        // ✅ remove legend
         legend: { display: false },
-          tooltip: {
-            callbacks: {
-              title: (items) => {
-                const i = items?.[0]?.dataIndex ?? 0;
-                if (computed.tooltipRanges && computed.tooltipRanges[i]) {
-                  return computed.tooltipRanges[i];
-                }
-              return items?.[0]?.label || "";
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const i = items?.[0]?.dataIndex ?? 0;
+              if (computed.tooltipRanges && computed.tooltipRanges[i]) {
+                return computed.tooltipRanges[i]; // weekly range
+              }
+              return items?.[0]?.label || ""; // month/day label
             },
             label: (ctx) => ` ₱${pesoCompact(ctx.parsed.y)}`,
           },
         },
       },
-
       scales: {
         y: {
           beginAtZero: true,
           ticks: {
             callback: (val) => `₱${pesoCompact(val)}`,
+          },
+        },
+        x: {
+          ticks: {
+            // keep daily readable
+            maxRotation: currentView === "daily" ? 0 : 0,
+            autoSkip: currentView === "daily",
+            maxTicksLimit: currentView === "daily" ? 10 : 12,
           },
         },
       },
@@ -543,7 +609,7 @@ async function renderOrders(force = false) {
         await updateOrderStatus(o._id, statusEl.value);
         o.status = statusEl.value;
 
-        // delivered affects sales
+        // Delivered changes sales => refresh chart
         await renderSalesAreaChart(true);
         await renderOrders(true);
       } catch (e) {
@@ -569,24 +635,33 @@ async function renderOrders(force = false) {
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     requireAdminLogin();
-
     updateYearToDateLabel();
 
-    // toggle buttons
     const btnMonthly = document.getElementById("btnMonthly");
     const btnWeekly = document.getElementById("btnWeekly");
+    const btnDaily = document.getElementById("btnDaily");
 
-    if (btnMonthly && btnWeekly) {
-      setActiveButton(currentView);
+    setActiveButton(currentView);
 
+    if (btnMonthly) {
       btnMonthly.addEventListener("click", async () => {
         currentView = "monthly";
         setActiveButton(currentView);
         await renderSalesAreaChart(true);
       });
+    }
 
+    if (btnWeekly) {
       btnWeekly.addEventListener("click", async () => {
         currentView = "weekly";
+        setActiveButton(currentView);
+        await renderSalesAreaChart(true);
+      });
+    }
+
+    if (btnDaily) {
+      btnDaily.addEventListener("click", async () => {
+        currentView = "daily";
         setActiveButton(currentView);
         await renderSalesAreaChart(true);
       });
@@ -601,8 +676,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (isAdminInteracting()) return;
       updateYearToDateLabel();
       await renderOrders();
-      // chart refresh is signature-protected (won't redraw unless changed)
-      await renderSalesAreaChart();
+      await renderSalesAreaChart(); // signature-protected
     }, REFRESH_INTERVAL);
   } catch (e) {
     alert(e.message);
