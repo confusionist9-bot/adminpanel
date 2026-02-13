@@ -62,7 +62,6 @@ function renderUsers(users) {
       <td><a href="mailto:${escapeHtml(u.email || "")}">${escapeHtml(u.email || "")}</a></td>
       <td>${escapeHtml(u.username || "")}</td>
       <td>${escapeHtml(u.mobile || "")}</td>
-      <td><button class="delete-btn" onclick="deleteUser('${u._id}')">Delete</button></td>
     `;
     tbody.appendChild(tr);
   });
