@@ -220,9 +220,14 @@ function pickOrderTimestamp(o) {
   return Number.isFinite(ms) ? ms : null;
 }
 
-/* =========================
-   MONTHLY COMPUTE (cumulative)
-========================= */
+/* ==========================================================
+   ✅ SALES COMPUTE (NOT cumulative)
+   - These return REAL sales per period (0 if no sales)
+   - Total YTD is computed by summing the series
+   - Delivered-only counts as sales
+========================================================== */
+
+/* MONTHLY */
 function computeMonthly(orders) {
   const { now } = getYearToDateRange();
   const year = now.getFullYear();
@@ -239,8 +244,7 @@ function computeMonthly(orders) {
   const totalsByMonth = Object.fromEntries(monthKeys.map((k) => [k, 0]));
 
   orders.forEach((o) => {
-    const status = String(o.status || "").trim();
-    if (status !== "Delivered") return;
+    if (String(o.status || "").trim() !== "Delivered") return;
 
     const ms = pickOrderTimestamp(o);
     if (!ms) return;
@@ -254,20 +258,13 @@ function computeMonthly(orders) {
     totalsByMonth[key] += Number(o.total || 0);
   });
 
-  const monthlyTotals = monthKeys.map((k) => Number(totalsByMonth[k] || 0));
+  const series = monthKeys.map((k) => Number(totalsByMonth[k] || 0));
+  const grandTotal = series.reduce((a, b) => a + b, 0);
 
-  let running = 0;
-  const cumulative = monthlyTotals.map((v) => {
-    running += v;
-    return running;
-  });
-
-  return { labels, series: cumulative, grandTotal: running, tooltipRanges: null };
+  return { labels, series, grandTotal, tooltipRanges: null, label: "Monthly Sales" };
 }
 
-/* =========================
-   WEEKLY COMPUTE (cumulative)
-========================= */
+/* WEEKLY */
 function fmtShort(d) {
   return d.toLocaleDateString("en-PH", { month: "short", day: "2-digit" });
 }
@@ -281,22 +278,20 @@ function computeWeekly(orders) {
   const weekMs = 7 * 24 * 60 * 60 * 1000;
 
   const weeksCount = Math.max(1, Math.ceil((nowMs - startMs + 1) / weekMs));
-
   const weeklyTotals = new Array(weeksCount).fill(0);
+
   const labels = [];
   const tooltipRanges = [];
 
   for (let i = 0; i < weeksCount; i++) {
     const wStart = new Date(startMs + i * weekMs);
     const wEnd = new Date(Math.min(startMs + (i + 1) * weekMs - 1, nowMs));
-
     labels.push(fmtShort(wStart));
     tooltipRanges.push(`${fmtShort(wStart)} – ${fmtShort(wEnd)}`);
   }
 
   orders.forEach((o) => {
-    const status = String(o.status || "").trim();
-    if (status !== "Delivered") return;
+    if (String(o.status || "").trim() !== "Delivered") return;
 
     const ms = pickOrderTimestamp(o);
     if (!ms) return;
@@ -311,18 +306,18 @@ function computeWeekly(orders) {
     weeklyTotals[idx] += Number(o.total || 0);
   });
 
-  let running = 0;
-  const cumulative = weeklyTotals.map((v) => {
-    running += v;
-    return running;
-  });
+  const grandTotal = weeklyTotals.reduce((a, b) => a + b, 0);
 
-  return { labels, series: cumulative, grandTotal: running, tooltipRanges };
+  return {
+    labels,
+    series: weeklyTotals,
+    grandTotal,
+    tooltipRanges,
+    label: "Weekly Sales",
+  };
 }
 
-/* =========================
-   DAILY COMPUTE (cumulative)
-========================= */
+/* DAILY */
 function computeDaily(orders) {
   const { start, now } = getYearToDateRange();
   const year = now.getFullYear();
@@ -332,23 +327,18 @@ function computeDaily(orders) {
   const dayMs = 24 * 60 * 60 * 1000;
 
   const daysCount = Math.floor((nowMs - startMs) / dayMs) + 1;
-
   const dailyTotals = new Array(daysCount).fill(0);
-  const labels = [];
 
+  const labels = [];
   for (let i = 0; i < daysCount; i++) {
     const d = new Date(startMs + i * dayMs);
     labels.push(
-      d.toLocaleDateString("en-PH", {
-        month: "short",
-        day: "2-digit",
-      })
+      d.toLocaleDateString("en-PH", { month: "short", day: "2-digit" })
     );
   }
 
   orders.forEach((o) => {
-    const status = String(o.status || "").trim();
-    if (status !== "Delivered") return;
+    if (String(o.status || "").trim() !== "Delivered") return;
 
     const ms = pickOrderTimestamp(o);
     if (!ms) return;
@@ -363,13 +353,9 @@ function computeDaily(orders) {
     dailyTotals[idx] += Number(o.total || 0);
   });
 
-  let running = 0;
-  const cumulative = dailyTotals.map((v) => {
-    running += v;
-    return running;
-  });
+  const grandTotal = dailyTotals.reduce((a, b) => a + b, 0);
 
-  return { labels, series: cumulative, grandTotal: running, tooltipRanges: null };
+  return { labels, series: dailyTotals, grandTotal, tooltipRanges: null, label: "Daily Sales" };
 }
 
 /* =========================
@@ -410,7 +396,7 @@ function setActiveButton(view) {
 
 /* =========================
    CHART RENDER (AREA)
-   - Legend removed
+   - NO legend
 ========================= */
 async function renderSalesAreaChart(force = false) {
   const canvas = document.getElementById("salesChart");
@@ -443,8 +429,8 @@ async function renderSalesAreaChart(force = false) {
 
   const manyPoints = computed.labels.length > 70;
   const pointRadius =
-    currentView === "weekly" ? 2 :
     currentView === "daily" ? (manyPoints ? 0 : 2) :
+    currentView === "weekly" ? 2 :
     4;
 
   salesChartInstance = new Chart(canvas, {
@@ -453,7 +439,7 @@ async function renderSalesAreaChart(force = false) {
       labels: computed.labels,
       datasets: [
         {
-          label: "Cumulative YTD",
+          label: computed.label,
           data: computed.series,
           borderColor: lineColor,
           backgroundColor: fillColor,
@@ -472,8 +458,7 @@ async function renderSalesAreaChart(force = false) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        // ✅ remove legend
-        legend: { display: false },
+        legend: { display: false }, // ✅ removed
         tooltip: {
           callbacks: {
             title: (items) => {
@@ -481,7 +466,7 @@ async function renderSalesAreaChart(force = false) {
               if (computed.tooltipRanges && computed.tooltipRanges[i]) {
                 return computed.tooltipRanges[i]; // weekly range
               }
-              return items?.[0]?.label || ""; // month/day label
+              return items?.[0]?.label || "";
             },
             label: (ctx) => ` ₱${pesoCompact(ctx.parsed.y)}`,
           },
@@ -496,8 +481,6 @@ async function renderSalesAreaChart(force = false) {
         },
         x: {
           ticks: {
-            // keep daily readable
-            maxRotation: currentView === "daily" ? 0 : 0,
             autoSkip: currentView === "daily",
             maxTicksLimit: currentView === "daily" ? 10 : 12,
           },
@@ -609,7 +592,6 @@ async function renderOrders(force = false) {
         await updateOrderStatus(o._id, statusEl.value);
         o.status = statusEl.value;
 
-        // Delivered changes sales => refresh chart
         await renderSalesAreaChart(true);
         await renderOrders(true);
       } catch (e) {
