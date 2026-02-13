@@ -59,7 +59,21 @@
           </thead>
 
           <tbody id="usersTableBody">
-            <!-- users.js will render rows here -->
+            <tr>
+              <td>Juan Dela Cruz</td>
+              <td><a href="mailto:juan@email.com">juan@email.com</a></td>
+              <td>JDCmalakas</td>
+              <td>0994 026 3907</td>
+              <td><button class="delete-btn" onclick="deleteUser(this)">Delete</button></td>
+            </tr>
+
+            <tr>
+              <td>Maria Santos</td>
+              <td><a href="mailto:maria@email.com">maria@email.com</a></td>
+              <td>Maria123</td>
+              <td>0912 554 6001</td>
+              <td><button class="delete-btn" onclick="deleteUser(this)">Delete</button></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -67,6 +81,7 @@
   </div>
 
   <script>
+
     function updateClock() {
       const now = new Date();
       let hours = now.getHours();

@@ -1,60 +1,44 @@
 const API_BASE = "https://miyummybackend.onrender.com";
 const ADMIN_TOKEN_KEY = "adminToken";
 
-function normalizeToken(raw) {
-  if (!raw) return null;
-
-  let t = String(raw).trim();
-
-  // if token got saved like JSON string: "\"eyJ...\""
-  try {
-    const parsed = JSON.parse(t);
-    if (typeof parsed === "string") t = parsed.trim();
-  } catch (_) {}
-
-  // if token got saved with Bearer already
-  if (t.toLowerCase().startsWith("bearer ")) {
-    t = t.slice(7).trim();
-  }
-
-  // basic sanity (jwt has 2 dots)
-  if ((t.match(/\./g) || []).length < 2) return null;
-
-  return t;
-}
-
+/* ============================= */
+/* AUTH CHECK */
+/* ============================= */
 function requireAdminLogin() {
-  const raw = localStorage.getItem(ADMIN_TOKEN_KEY);
-  const token = normalizeToken(raw);
-
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) {
-    localStorage.removeItem(ADMIN_TOKEN_KEY);
     window.location.href = "login.html";
-    throw new Error("Admin token missing/invalid");
+    throw new Error("Not logged in");
   }
   return token;
 }
 
+/* ============================= */
+/* FETCH WRAPPER */
+/* ============================= */
 async function apiFetch(path, options = {}) {
   const token = requireAdminLogin();
 
   const headers = {
-    ...(options.headers || {}),
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`
+    ...(options.headers || {}),
+    Authorization: `Bearer ${token}`,
   };
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+  });
 
   const contentType = res.headers.get("content-type") || "";
-  const body = contentType.includes("application/json") ? await res.json() : await res.text();
+  const body = contentType.includes("application/json")
+    ? await res.json()
+    : await res.text();
 
   if (!res.ok) {
     console.error("❌ Failed:", res.status, body);
 
-    // if token invalid/expired/admin only -> force relogin
     if (res.status === 401 || res.status === 403) {
-      alert(body?.message || body || "Session expired. Please login again.");
       localStorage.removeItem(ADMIN_TOKEN_KEY);
       window.location.href = "login.html";
       return null;
@@ -67,52 +51,41 @@ async function apiFetch(path, options = {}) {
   return body;
 }
 
-function escapeHtml(str) {
-  return String(str ?? "").replace(/[&<>"']/g, (m) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  }[m]));
+/* ============================= */
+/* LOAD USERS */
+/* ============================= */
+async function loadUsers() {
+  const users = await apiFetch("/admin/users");
+  if (!users) return;
+  renderUsers(Array.isArray(users) ? users : []);
 }
 
-function matchesSearch(u, q) {
-  const text = `${u.firstName} ${u.lastName} ${u.email} ${u.username} ${u.mobile}`.toLowerCase();
-  return text.includes(q);
-}
-
-let USERS_CACHE = [];
-
+/* ============================= */
+/* RENDER USERS */
+/* ============================= */
 function renderUsers(users) {
   const tbody = document.getElementById("usersTableBody");
-  const searchInput = document.getElementById("searchInput");
-  const q = (searchInput?.value || "").trim().toLowerCase();
-
-  const filtered = q ? users.filter(u => matchesSearch(u, q)) : users;
-
   tbody.innerHTML = "";
 
-  if (!filtered.length) {
+  if (!users.length) {
     tbody.innerHTML = `<tr><td colspan="5">No users found.</td></tr>`;
     return;
   }
 
-  filtered.forEach((u) => {
-    const isBanned = !!u.isBanned;
-
-    const btnLabel = isBanned ? "Unban" : "Ban";
-    const btnClass = isBanned ? "unban-btn" : "ban-btn";
-
+  users.forEach((u) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(u.firstName || "")} ${escapeHtml(u.lastName || "")}</td>
-      <td><a href="mailto:${escapeHtml(u.email || "")}">${escapeHtml(u.email || "")}</a></td>
+      <td>
+        <a href="mailto:${escapeHtml(u.email || "")}">
+          ${escapeHtml(u.email || "")}
+        </a>
+      </td>
       <td>${escapeHtml(u.username || "")}</td>
       <td>${escapeHtml(u.mobile || "")}</td>
       <td>
-        <button class="${btnClass}" onclick="toggleBan('${u._id}', ${isBanned})">
-          ${btnLabel}
+        <button class="delete-btn" onclick="deleteUser('${u._id}')">
+          Delete
         </button>
       </td>
     `;
@@ -120,32 +93,53 @@ function renderUsers(users) {
   });
 }
 
-async function loadUsers() {
-  const users = await apiFetch("/admin/users", { method: "GET" });
-  if (!users) return;
+/* ============================= */
+/* DELETE USER */
+/* ============================= */
+async function deleteUser(id) {
+  const confirmDelete = confirm("Are you sure you want to delete this user?");
+  if (!confirmDelete) return;
 
-  USERS_CACHE = Array.isArray(users) ? users : [];
-  renderUsers(USERS_CACHE);
-}
+  const result = await apiFetch(`/admin/users/${id}`, {
+    method: "DELETE",
+  });
 
-async function toggleBan(userId, currentlyBanned) {
-  const actionText = currentlyBanned ? "unban" : "ban";
-  const ok = confirm(`Are you sure you want to ${actionText} this user?`);
-  if (!ok) return;
-
-  const result = await apiFetch(`/admin/users/${userId}/ban`, { method: "PATCH" });
   if (!result) return;
 
-  loadUsers();
+  alert("User deleted successfully!");
+  loadUsers(); // refresh table
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  requireAdminLogin();
+/* ============================= */
+/* SEARCH */
+/* ============================= */
+document.getElementById("searchInput").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
 
-  const searchInput = document.getElementById("searchInput");
-  if (searchInput) {
-    searchInput.addEventListener("input", () => renderUsers(USERS_CACHE));
-  }
-
-  loadUsers();
+  document.querySelectorAll("#usersTableBody tr").forEach((row) => {
+    row.style.display = row.textContent.toLowerCase().includes(value)
+      ? ""
+      : "none";
+  });
 });
+
+/* ============================= */
+/* HELPER */
+/* ============================= */
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, (m) =>
+    ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;",
+    }[m])
+  );
+}
+
+/* ============================= */
+/* INIT */
+/* ============================= */
+requireAdminLogin();
+loadUsers();
