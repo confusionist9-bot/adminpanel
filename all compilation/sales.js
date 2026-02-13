@@ -162,9 +162,10 @@ function buildOrdersSignature(orders) {
 }
 
 /* =========================
-   MONTHLY SALES (Jan → now)
-   - NO flavors
-   - Delivered only counts as "sales"
+   MONTHLY YTD (Jan → Now)
+   - No flavors
+   - Delivered only counts as Sales
+   - Area chart of CUMULATIVE YTD
 ========================= */
 function getYearToDateRange() {
   const now = new Date();
@@ -203,16 +204,15 @@ function buildMonthBucketsForYearToDate() {
   const currentMonthIndex = now.getMonth(); // 0..11
 
   const labels = [];
-  const monthKeys = []; // "YYYY-MM" used for mapping totals
+  const monthKeys = [];
 
   for (let m = 0; m <= currentMonthIndex; m++) {
     const d = new Date(year, m, 1);
     labels.push(monthLabel(d));
-    const key = `${year}-${String(m + 1).padStart(2, "0")}`;
-    monthKeys.push(key);
+    monthKeys.push(`${year}-${String(m + 1).padStart(2, "0")}`);
   }
 
-  return { labels, monthKeys, year, currentMonthIndex };
+  return { labels, monthKeys, year };
 }
 
 async function fetchOrders() {
@@ -220,7 +220,6 @@ async function fetchOrders() {
 }
 
 function pickOrderTimestamp(o) {
-  // prefer orderDate, fallback createdAt
   const t = o?.orderDate ?? o?.createdAt;
   const ms = typeof t === "number" ? t : Date.parse(t);
   return Number.isFinite(ms) ? ms : null;
@@ -230,13 +229,11 @@ function computeMonthlySalesFromOrders(orders) {
   const { labels, monthKeys, year } = buildMonthBucketsForYearToDate();
   const totalsByMonth = Object.fromEntries(monthKeys.map((k) => [k, 0]));
 
-  let grandTotal = 0;
-
   orders.forEach((o) => {
     const status = String(o.status || "").trim();
     if (status === "Cancelled") return;
 
-    // ✅ count only Delivered as actual sales
+    // ✅ count only Delivered as real sales
     if (status !== "Delivered") return;
 
     const ms = pickOrderTimestamp(o);
@@ -248,23 +245,46 @@ function computeMonthlySalesFromOrders(orders) {
     const key = `${year}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     if (!(key in totalsByMonth)) return;
 
-    const amount = Number(o.total || 0);
-    totalsByMonth[key] += amount;
-    grandTotal += amount;
+    totalsByMonth[key] += Number(o.total || 0);
   });
 
-  const series = monthKeys.map((k) => Number(totalsByMonth[k] || 0));
-  return { labels, series, grandTotal };
+  const monthlySeries = monthKeys.map((k) => Number(totalsByMonth[k] || 0));
+
+  // Build cumulative YTD series for Area chart
+  let running = 0;
+  const cumulativeSeries = monthlySeries.map((v) => {
+    running += v;
+    return running;
+  });
+
+  const grandTotal = running;
+
+  return { labels, monthlySeries, cumulativeSeries, grandTotal };
 }
 
-async function renderSalesChartMonthlyYTD() {
+function pesoCompact(value) {
+  const n = Number(value || 0);
+  // 12000 -> 12,000 (simple)
+  return n.toLocaleString("en-PH");
+}
+
+function hexToRgba(hex, alpha) {
+  // supports #RRGGBB
+  const h = hex.replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+async function renderSalesAreaChartMonthlyYTD() {
   const canvas = document.getElementById("salesChart");
   if (!canvas) return;
 
   const totalSalesDisplay = document.getElementById("totalSalesDisplay");
-
   const orders = await fetchOrders();
-  const { labels, series, grandTotal } = computeMonthlySalesFromOrders(orders);
+
+  const { labels, cumulativeSeries, grandTotal } = computeMonthlySalesFromOrders(orders);
 
   if (totalSalesDisplay) {
     totalSalesDisplay.textContent = `Total Sales (YTD): ${money(grandTotal)}`;
@@ -275,23 +295,52 @@ async function renderSalesChartMonthlyYTD() {
     salesChartInstance = null;
   }
 
+  // Keep your color theme
+  const lineColor = "#94bbb4";
+  const fillColor = hexToRgba("#D9EEEA", 0.85); // soft fill, still your color
+
   salesChartInstance = new Chart(canvas, {
-    type: "bar",
+    type: "line",
     data: {
       labels,
       datasets: [
         {
-          label: "Monthly Sales",
-          data: series,
-          backgroundColor: "#94bbb4",
+          label: "Cumulative YTD",
+          data: cumulativeSeries,
+          borderColor: lineColor,
+          backgroundColor: fillColor,
+          fill: true,
+          tension: 0.35, // smooth curve
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: lineColor,
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 2,
+          borderWidth: 3,
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { boxWidth: 14, boxHeight: 14 },
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ` ₱${pesoCompact(ctx.parsed.y)}`,
+          },
+        },
+      },
       scales: {
-        y: { beginAtZero: true },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: (val) => `₱${pesoCompact(val)}`,
+          },
+        },
       },
     },
   });
@@ -328,7 +377,6 @@ async function renderOrders(force = false) {
   table.querySelectorAll(".table-row, .dropdown-content").forEach((e) => e.remove());
 
   orders.forEach((o, idx) => {
-    const dropId = `drop_${idx}`;
     const statusId = `status_${idx}`;
     const riderNameId = `riderName_${idx}`;
     const riderContactId = `riderContact_${idx}`;
@@ -349,7 +397,6 @@ async function renderOrders(force = false) {
 
     const drop = document.createElement("div");
     drop.className = "dropdown-content";
-    drop.id = dropId;
     drop.style.display = "none";
 
     const addr = o.deliveryAddressSnapshot || {};
@@ -401,8 +448,8 @@ async function renderOrders(force = false) {
         await updateOrderStatus(o._id, statusEl.value);
         o.status = statusEl.value;
 
-        // refresh chart because Delivered affects monthly sales
-        await renderSalesChartMonthlyYTD();
+        // ✅ refresh chart because Delivered affects sales
+        await renderSalesAreaChartMonthlyYTD();
         await renderOrders(true);
       } catch (e) {
         alert(e.message);
@@ -432,7 +479,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (window.loadServiceStatus) await window.loadServiceStatus();
 
-    await renderSalesChartMonthlyYTD();
+    await renderSalesAreaChartMonthlyYTD();
     await renderOrders(true);
 
     setInterval(async () => {
