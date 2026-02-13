@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const API_BASE = "https://miyummybackend.onrender.com";
   const EDIT_ID_KEY = "editBranchId";
-
   const ADMIN_TOKEN_KEY = "adminToken";
-
 
   function requireAdminLogin() {
     const token = localStorage.getItem(ADMIN_TOKEN_KEY);
@@ -50,12 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateClock, 1000);
 
   function timeToMinutes(time) {
-    const [h, m] = time.split(":").map(Number);
+    const [h, m] = String(time || "0:0").split(":").map(Number);
     return h * 60 + m;
   }
 
   function formatTime12(time24) {
-    const [hh, mm] = time24.split(":").map(Number);
+    const [hh, mm] = String(time24 || "00:00").split(":").map(Number);
     const ampm = hh >= 12 ? "PM" : "AM";
     const hours12 = hh % 12 || 12;
     const minutes = String(mm).padStart(2, "0");
@@ -100,8 +97,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  async function renderBranches() {
+  function isWithinOperatingHours(open, close) {
+    const openMin = timeToMinutes(open);
+    const closeMin = timeToMinutes(close);
 
+    // Your UI currently enforces close > open, so we keep it simple.
+    // If later you allow overnight (e.g., 20:00-04:00), we can extend this.
+    if (!(openMin < closeMin)) return false;
+
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+
+    // Open at openTime, closed at closeTime
+    return nowMin >= openMin && nowMin < closeMin;
+  }
+
+  async function renderBranches() {
     requireAdminLogin();
 
     const list = document.getElementById("branchesList");
@@ -137,16 +148,24 @@ document.addEventListener("DOMContentLoaded", () => {
           const address = b.branchDescription || "";
           const open = b.openTime || "09:00";
           const close = b.closeTime || "21:00";
-          const isActive = b.isActive !== false;
 
-          const statusLabel = isActive ? "Open" : "Closed";
+          // Manual status from admin (stored in DB)
+          const manualActive = b.isActive !== false;
+
+          // Automatic status based on time
+          const withinHours = isWithinOperatingHours(open, close);
+
+          // Final: must be manually active AND within operating hours
+          const finalActive = manualActive && withinHours;
+
+          const statusLabel = finalActive ? "Open" : "Closed";
 
           return `
             <div class="branch-card"
                  data-id="${id}"
                  data-open="${open}"
                  data-close="${close}"
-                 data-active="${isActive ? "1" : "0"}">
+                 data-active="${manualActive ? "1" : "0"}">
 
               <button class="delete-btn" title="Delete branch">
                 <svg viewBox="0 0 24 24" class="trash-icon">
@@ -166,7 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
               <div class="branch-actions">
                 <button class="edit-btn">Edit</button>
-                <button class="status-btn ${isActive ? "open" : "inactive"}">
+
+                <!-- NOTE: button shows OPEN/CLOSED based on time + manual active -->
+                <button class="status-btn ${finalActive ? "open" : "inactive"}">
                   ${statusLabel} <span class="dot"></span>
                 </button>
               </div>
@@ -215,21 +236,24 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Manual toggle: still allowed.
+    // If admin sets inactive = closed always.
+    // If admin sets active = it will only show OPEN during operating hours.
     const statusBtn = e.target.closest(".status-btn");
     if (statusBtn) {
       const card = statusBtn.closest(".branch-card");
       const id = card?.dataset.id;
       if (!id) return;
 
-      const currentActive = card.dataset.active === "1";
-      const msg = currentActive
+      const currentManualActive = card.dataset.active === "1";
+      const msg = currentManualActive
         ? "Set this branch to CLOSED?\n\nCustomers will see it as unavailable."
-        : "Set this branch to ACTIVE?\n\nCustomers can use this branch again.";
+        : "Set this branch to ACTIVE?\n\nCustomers can use this branch again (only during operating hours).";
 
       if (!confirm(msg)) return;
 
       try {
-        await apiUpdateBranch(id, { isActive: !currentActive });
+        await apiUpdateBranch(id, { isActive: !currentManualActive });
         await renderBranches();
       } catch (err) {
         alert(err.message || "Failed to update branch status.");
@@ -272,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
           branchDescription: address,
           openTime: open,
           closeTime: close,
-          isActive: true,
+          isActive: true, // manual active by default
         });
 
         window.location.href = "branches.html";
@@ -349,6 +373,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   renderBranches();
+
+  // ✅ Auto-refresh every minute so OPEN/CLOSED updates without reload
+  setInterval(renderBranches, 60000);
 
   function escapeHtml(str) {
     return String(str ?? "")
