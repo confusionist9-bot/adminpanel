@@ -59,9 +59,23 @@
   <div class="content">
     <div class="sales-header">
       <div class="left-header">
-        <h2>Sales Overview (Monthly YTD)</h2>
+        <h2 id="salesTitle">Sales Overview (Monthly YTD)</h2>
         <div id="dayRangeLabel" style="font-size:16px; opacity:0.8; margin-top:6px;"></div>
+
+        <!-- View toggle -->
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+          <button id="btnMonthly"
+            style="padding:8px 14px; border-radius:10px; border:2px solid #94bbb4; background:#94bbb4; color:white; font-weight:600; cursor:pointer;">
+            Monthly
+          </button>
+
+          <button id="btnWeekly"
+            style="padding:8px 14px; border-radius:10px; border:2px solid #94bbb4; background:white; color:#1f2b2a; font-weight:600; cursor:pointer;">
+            Weekly
+          </button>
+        </div>
       </div>
+
       <p class="total-sales" id="totalSalesDisplay">Total Sales (YTD): ₱0.00</p>
     </div>
 
