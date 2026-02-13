@@ -1,4 +1,3 @@
-
 function getApiBase() {
   return window.API_BASE || "https://miyummybackend.onrender.com";
 }
@@ -8,6 +7,16 @@ async function getServiceStatus() {
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to load service status");
   return data.status;
+}
+
+async function setServiceStatus(status) {
+  await fetch(`${getApiBase()}/admin/service-status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ status })
+  });
 }
 
 function applyServiceStatusUI(status) {
@@ -24,18 +33,45 @@ function applyServiceStatusUI(status) {
   }
 }
 
-async function loadServiceStatus() {
+async function autoControlServiceStatus() {
+  const now = new Date();
+  const hour = now.getHours(); // 0–23
+
+  // Open from 9:00 AM (9) until 8:59 PM (20)
+  const shouldBeActive = hour >= 9 && hour < 21;
+
   try {
-    const status = await getServiceStatus();
-    applyServiceStatusUI(status);
+    const currentStatus = await getServiceStatus();
+
+    if (shouldBeActive && currentStatus !== "active") {
+      await setServiceStatus("active");
+      applyServiceStatusUI("active");
+    }
+
+    if (!shouldBeActive && currentStatus !== "inactive") {
+      await setServiceStatus("inactive");
+      applyServiceStatusUI("inactive");
+    }
+
+    if (currentStatus === "active" || currentStatus === "inactive") {
+      applyServiceStatusUI(currentStatus);
+    }
+
   } catch (e) {
     console.error(e.message);
     applyServiceStatusUI("inactive");
   }
 }
 
+function loadServiceStatus() {
+  autoControlServiceStatus();
+}
+
 window.loadServiceStatus = loadServiceStatus;
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadServiceStatus();
+  autoControlServiceStatus();
+
+  // Check every 60 seconds
+  setInterval(autoControlServiceStatus, 60000);
 });
