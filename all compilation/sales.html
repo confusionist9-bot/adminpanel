@@ -12,22 +12,23 @@
     <div class="logo-section">
       <img src="logo.png" alt="MiYummy Logo" class="logo">
     </div>
+
     <div class="user-section">
       <p class="user-name"><strong>(Admin Dashboard)</strong></p>
     </div>
-  <nav class="menu">
-  <a href="sales.html" class="active">Sales overview</a>
-  <a href="users.html">Users management</a>
-  <a href="products.html">Products</a>
-  <a href="branches.html">Branches</a>
-</nav>
 
-
+    <nav class="menu">
+      <a href="sales.html" class="active">Sales overview</a>
+      <a href="users.html">Users management</a>
+      <a href="products.html">Products</a>
+      <a href="branches.html">Branches</a>
+    </nav>
 
     <button class="logout" onclick="adminLogout()">
       Log out
     </button>
   </div>
+
   <div class="top-menu">
     <div class="status">
       <div class="status-box">
@@ -37,43 +38,37 @@
     <div id="clock" class="time-box"></div>
   </div>
 
-    <script>
+  <script>
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
 
-  function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      minutes = minutes.toString().padStart(2, '0');
 
-    hours = hours % 12 || 12;
-    minutes = minutes.toString().padStart(2, '0');
-
-    const timeString = `${hours}:${minutes} ${ampm}`;
-    document.getElementById('clock').textContent = timeString;
-  }
-
-  setInterval(updateClock, 1000);
-  updateClock();
-
-  function adminLogout() {
-    if (confirm("Are you sure you want to log out?")) {
-      window.location.href = "login.html";
+      const timeString = `${hours}:${minutes} ${ampm}`;
+      document.getElementById('clock').textContent = timeString;
     }
-  }
+
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
-  
+
   <div class="content">
     <div class="sales-header">
       <div class="left-header">
-        <h2>Sales Overview (Year to Date)</h2>
+        <h2>Sales Overview (Monthly YTD)</h2>
         <div id="dayRangeLabel" style="font-size:16px; opacity:0.8; margin-top:6px;"></div>
       </div>
-      <p class="total-sales" id="totalSalesDisplay">Total Sales: ₱0.00</p>
+      <p class="total-sales" id="totalSalesDisplay">Total Sales (YTD): ₱0.00</p>
     </div>
 
     <div class="graph-container">
       <canvas id="salesChart"></canvas>
     </div>
+
     <div class="orders-container">
       <h2 class="orders-title">Orders Management</h2>
 
@@ -85,15 +80,12 @@
           <div>Order status</div>
         </div>
       </div>
-
     </div>
   </div>
 
-<script src="service-status.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="sales.js"></script>
-<script src="logout.js" defer></script>
-
-
+  <script src="service-status.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="sales.js"></script>
+  <script src="logout.js" defer></script>
 </body>
 </html>
