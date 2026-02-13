@@ -178,7 +178,7 @@ function hexToRgba(hex, alpha) {
 }
 
 /* =========================
-   RANGE + LABEL
+   RANGE + LABEL (Year to Date)
 ========================= */
 function getYearToDateRange() {
   const now = new Date();
@@ -220,11 +220,26 @@ function pickOrderTimestamp(o) {
   return Number.isFinite(ms) ? ms : null;
 }
 
+/* =========================
+   ✅ TODAY FILTER (Orders Management)
+========================= */
+function getTodayStartEndMs() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).getTime();
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0).getTime();
+  return { start, end };
+}
+
+function isOrderToday(order) {
+  const ms = pickOrderTimestamp(order);
+  if (!ms) return false;
+  const { start, end } = getTodayStartEndMs();
+  return ms >= start && ms < end;
+}
+
 /* ==========================================================
-   ✅ SALES COMPUTE (NOT cumulative)
-   - These return REAL sales per period (0 if no sales)
-   - Total YTD is computed by summing the series
-   - Delivered-only counts as sales
+   SALES COMPUTE (NOT cumulative)
+   - Delivered only counts as Sales
 ========================================================== */
 
 /* MONTHLY */
@@ -308,13 +323,7 @@ function computeWeekly(orders) {
 
   const grandTotal = weeklyTotals.reduce((a, b) => a + b, 0);
 
-  return {
-    labels,
-    series: weeklyTotals,
-    grandTotal,
-    tooltipRanges,
-    label: "Weekly Sales",
-  };
+  return { labels, series: weeklyTotals, grandTotal, tooltipRanges, label: "Weekly Sales" };
 }
 
 /* DAILY */
@@ -332,9 +341,7 @@ function computeDaily(orders) {
   const labels = [];
   for (let i = 0; i < daysCount; i++) {
     const d = new Date(startMs + i * dayMs);
-    labels.push(
-      d.toLocaleDateString("en-PH", { month: "short", day: "2-digit" })
-    );
+    labels.push(d.toLocaleDateString("en-PH", { month: "short", day: "2-digit" }));
   }
 
   orders.forEach((o) => {
@@ -458,13 +465,13 @@ async function renderSalesAreaChart(force = false) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false }, // ✅ removed
+        legend: { display: false },
         tooltip: {
           callbacks: {
             title: (items) => {
               const i = items?.[0]?.dataIndex ?? 0;
               if (computed.tooltipRanges && computed.tooltipRanges[i]) {
-                return computed.tooltipRanges[i]; // weekly range
+                return computed.tooltipRanges[i];
               }
               return items?.[0]?.label || "";
             },
@@ -475,9 +482,7 @@ async function renderSalesAreaChart(force = false) {
       scales: {
         y: {
           beginAtZero: true,
-          ticks: {
-            callback: (val) => `₱${pesoCompact(val)}`,
-          },
+          ticks: { callback: (val) => `₱${pesoCompact(val)}` },
         },
         x: {
           ticks: {
@@ -491,7 +496,7 @@ async function renderSalesAreaChart(force = false) {
 }
 
 /* =========================
-   ORDERS MANAGEMENT (same)
+   ORDERS MANAGEMENT (TODAY ONLY)
 ========================= */
 async function updateOrderStatus(orderId, status) {
   return await apiFetch(`/admin/orders/${orderId}/status`, {
@@ -509,7 +514,12 @@ async function assignRider(orderId, name, contact) {
 
 async function renderOrders(force = false) {
   let orders = await fetchOrders();
+
+  // ✅ remove cancelled
   orders = orders.filter((o) => String(o.status || "").trim() !== "Cancelled");
+
+  // ✅ show only TODAY orders
+  orders = orders.filter(isOrderToday);
 
   const signature = buildOrdersSignature(orders);
   if (!force && signature === lastOrdersSignature) return;
@@ -658,7 +668,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (isAdminInteracting()) return;
       updateYearToDateLabel();
       await renderOrders();
-      await renderSalesAreaChart(); // signature-protected
+      await renderSalesAreaChart();
     }, REFRESH_INTERVAL);
   } catch (e) {
     alert(e.message);
