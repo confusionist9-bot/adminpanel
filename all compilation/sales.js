@@ -414,20 +414,21 @@ async function renderSalesAreaChart(force = false) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: true },
-        tooltip: {
-          callbacks: {
-            title: (items) => {
-              const i = items?.[0]?.dataIndex ?? 0;
-              if (computed.tooltipRanges && computed.tooltipRanges[i]) {
-                return computed.tooltipRanges[i];
-              }
+        legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: (items) => {
+                const i = items?.[0]?.dataIndex ?? 0;
+                if (computed.tooltipRanges && computed.tooltipRanges[i]) {
+                  return computed.tooltipRanges[i];
+                }
               return items?.[0]?.label || "";
             },
             label: (ctx) => ` ₱${pesoCompact(ctx.parsed.y)}`,
           },
         },
       },
+
       scales: {
         y: {
           beginAtZero: true,
