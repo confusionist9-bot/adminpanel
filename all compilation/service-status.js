@@ -33,45 +33,19 @@ function applyServiceStatusUI(status) {
   }
 }
 
-async function autoControlServiceStatus() {
-  const now = new Date();
-  const hour = now.getHours(); // 0–23
-
-  // Open from 9:00 AM (9) until 8:59 PM (20)
-  const shouldBeActive = hour >= 9 && hour < 21;
-
+// ✅ Load current status from backend only
+async function loadServiceStatus() {
   try {
-    const currentStatus = await getServiceStatus();
-
-    if (shouldBeActive && currentStatus !== "active") {
-      await setServiceStatus("active");
-      applyServiceStatusUI("active");
-    }
-
-    if (!shouldBeActive && currentStatus !== "inactive") {
-      await setServiceStatus("inactive");
-      applyServiceStatusUI("inactive");
-    }
-
-    if (currentStatus === "active" || currentStatus === "inactive") {
-      applyServiceStatusUI(currentStatus);
-    }
-
+    const status = await getServiceStatus();
+    applyServiceStatusUI(status);
   } catch (e) {
     console.error(e.message);
     applyServiceStatusUI("inactive");
   }
 }
 
-function loadServiceStatus() {
-  autoControlServiceStatus();
-}
-
 window.loadServiceStatus = loadServiceStatus;
 
 document.addEventListener("DOMContentLoaded", () => {
-  autoControlServiceStatus();
-
-  // Check every 60 seconds
-  setInterval(autoControlServiceStatus, 60000);
+  loadServiceStatus();
 });
