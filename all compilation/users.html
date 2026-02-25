@@ -1,108 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Users Management</title>
-  <link rel="stylesheet" href="users.css" />
+  <title>Users - Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #f4f4f4;
+    }
+
+    button {
+      padding: 6px 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #cc0000;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="sidebar">
-    <div class="logo-section">
-      <img src="logo.png" alt="MiYummy Logo" class="logo" />
-    </div>
+  <h2>Registered Users</h2>
 
-    <div class="user-section">
-      <p class="user-name"><strong>(Admin Dashboard)</strong></p>
-    </div>
-
-    <nav class="menu">
-      <a href="sales.html">Sales overview</a>
-      <a href="users.html" class="active">Users management</a>
-      <a href="products.html">Products</a>
-      <a href="branches.html">Branches</a>
-    </nav>
-
-    <button class="logout" onclick="adminLogout()">Log out</button>
-  </div>
-
-  <div class="top-menu">
-    <div class="status">
-      <div class="status-box">
-        <span class="status-text">Service Active</span>
-      </div>
-    </div>
-    <div id="clock" class="time-box"></div>
-  </div>
-
-  <div class="main-content">
-    <div class="page-header">
-      <h2>Users management</h2>
-
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search user" />
-      </div>
-    </div>
-
-    <div class="table-card">
-      <div class="table-scroll">
-        <table class="users-table">
-          <thead>
-            <tr>
-              <th>Full name</th>
-              <th>Email</th>
-              <th>Username</th>
-              <th class="col-number">Number</th>
-            </tr>
-          </thead>
-
-          <tbody id="usersTableBody">
-            <tr>
-              <td>Juan Dela Cruz</td>
-              <td><a href="mailto:juan@email.com">juan@email.com</a></td>
-              <td>JDCmalakas</td>
-              <td>0994 026 3907</td>
-            </tr>
-
-            <tr>
-              <td>Maria Santos</td>
-              <td><a href="mailto:maria@email.com">maria@email.com</a></td>
-              <td>Maria123</td>
-              <td>0912 554 6001</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Created</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="usersTable">
+      <tr>
+        <td colspan="6">Loading...</td>
+      </tr>
+    </tbody>
+  </table>
 
   <script>
+    const API_BASE = "https://miyummybackend.onrender.com"; 
+    // If local: http://localhost:4000
 
-    function updateClock() {
-      const now = new Date();
-      let hours = now.getHours();
-      let minutes = now.getMinutes();
-      const ampm = hours >= 12 ? "PM" : "AM";
+    async function loadUsers() {
+      const tbody = document.getElementById("usersTable");
 
-      hours = hours % 12 || 12;
-      minutes = minutes.toString().padStart(2, "0");
+      try {
+        const res = await fetch(`${API_BASE}/admin/users`);
+        const users = await res.json();
 
-      document.getElementById("clock").textContent = `${hours}:${minutes} ${ampm}`;
-    }
+        if (!Array.isArray(users) || users.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6">No users found</td></tr>`;
+          return;
+        }
 
-    setInterval(updateClock, 1000);
-    updateClock();
+        tbody.innerHTML = "";
 
-    function adminLogout() {
-      if (confirm("Are you sure you want to log out?")) {
-        window.location.href = "login.html";
+        users.forEach(user => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td>${user.firstName} ${user.lastName}</td>
+            <td>${user.username}</td>
+            <td>${user.email}</td>
+            <td>${user.mobile}</td>
+            <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+            <td>
+              <button class="delete-btn" onclick="deleteUser('${user._id}')">
+                Delete
+              </button>
+            </td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error("Load users error:", err);
+        tbody.innerHTML = `<tr><td colspan="6">Error loading users</td></tr>`;
       }
     }
+
+    async function deleteUser(userId) {
+      const confirmDelete = confirm("Are you sure you want to delete this user?");
+      if (!confirmDelete) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
+          method: "DELETE"
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.message || "Failed to delete user");
+          return;
+        }
+
+        alert("User deleted successfully!");
+        loadUsers(); // refresh table
+
+      } catch (err) {
+        console.error("Delete error:", err);
+        alert("Server error");
+      }
+    }
+
+    loadUsers();
   </script>
 
-  <script src="service-status.js"></script>
-  <script src="users.js"></script>
-  <script src="logout.js" defer></script>
 </body>
 </html>
