@@ -200,27 +200,42 @@ body {
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
+  table-layout: fixed;     /* prevents uneven column gaps */
+  min-width: 0;            /* remove forced wide table */
 }
 
-.users-table thead th {
-  text-align: left;
-  font-weight: 700;
-  font-size: 14px;
-  background: #f1f7f4;
-  padding: 14px 16px;
-  border-bottom: 1px solid #e7f0eb;
+/* Column widths */
+.users-table th:nth-child(1),
+.users-table td:nth-child(1) {
+  width: 22%;              /* Full name */
+}
+
+.users-table th:nth-child(2),
+.users-table td:nth-child(2) {
+  width: 38%;              /* Email */
+}
+
+.users-table th:nth-child(3),
+.users-table td:nth-child(3) {
+  width: 16%;              /* Username */
+}
+
+.users-table th:nth-child(4),
+.users-table td:nth-child(4) {
+  width: 14%;              /* Number */
+}
+
+.users-table th:nth-child(5),
+.users-table td:nth-child(5) {
+  width: 10%;              /* Action */
+}
+
+/* Prevent long text stretching */
+.users-table th,
+.users-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.users-table tbody td {
-  padding: 14px 16px;
-  border-bottom: 1px solid #eef5f1;
-  vertical-align: middle;
-}
-
-.users-table tbody tr:hover {
-  background: #f8fcfa;
 }
 
 .col-profile {
