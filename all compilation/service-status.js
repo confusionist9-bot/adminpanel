@@ -1,5 +1,5 @@
 function getApiBase() {
-  return window.API_BASE || "https://miyummybackend.onrender.com";
+  return window.API_BASE || "https://miyummybackend-se.onrender.com";
 }
 
 async function getServiceStatus() {

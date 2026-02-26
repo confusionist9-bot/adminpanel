@@ -1,4 +1,4 @@
-const API_BASE = "https://miyummybackend.onrender.com";
+const API_BASE = "https://miyummybackend-se.onrender.com";
 window.API_BASE = API_BASE;
 
 const ADMIN_TOKEN_KEY = "adminToken";
